@@ -32,13 +32,27 @@
       }
 
       const inv = data[0];
+      // 🚨 Nueva validación: si el estado es "pendiente", bloqueamos la edición
+      if (inv.estado === "pendiente") {
+        document.getElementById("info").innerHTML = `
+          <p><b>Nombre:</b> ${inv.nombre || "—"}</p>
+          <p><b>DNI:</b> ${inv.dni}</p>
+          <p><b>Lugar:</b> ${inv.lugar_trabajo || "—"}</p>
+          <p><b>Estado:</b> ❌ No se ha completado la inscripción.</p>
+          <p style="color:red; font-weight:bold;">⚠️ No se puede registrar retiro ni editar opciones hasta que esta persona se inscriba.</p>
+        `;
+        return; // 👈 detenemos acá el flujo
+      }
+
+      // ✅ Si está inscripto, seguimos como antes
       document.getElementById("info").innerHTML = `
         <p><b>Nombre:</b> ${inv.nombre}</p>
         <p><b>Correo:</b> ${inv.correo}</p>
         <p><b>Lugar:</b> ${inv.lugar_trabajo}</p>
+        <p><b>Estado:</b> ${inv.estado}</p>
         <p><b>Opciones:</b> <input type="number" id="opciones" value="${inv.opciones || 0}" /></p>
         <p><b>Retiro:</b> ${inv.retiro ? "✅ Sí" : "❌ No"}</p>
-        <button onclick="marcarRetiro('${dni}')">✅ Confirmar retiro</button>
+        <button onclick="confirmarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
       `;
     });
 
