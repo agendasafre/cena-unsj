@@ -4,77 +4,97 @@
   <meta charset="UTF-8" />
   <title>Registro - Cena de Fin de Año 🎉</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f8;
-      max-width: 500px;
-      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
       padding: 20px;
     }
-    h2 { text-align: center; }
+    .container {
+      width: 100%;
+      max-width: 420px;
+    }
+    h2 { 
+      text-align: center; 
+      color: #1d3557; 
+      margin-bottom: 20px;
+    }
     form {
       background: white;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+      color: #333;
     }
     input, button {
       width: 100%;
       padding: 12px;
-      margin: 8px 0;
+      margin-top: 5px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      box-sizing: border-box;
     }
     button {
       background: #1d3557;
       color: white;
       cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.2s;
+    }
+    button:hover:not(:disabled) {
+      background: #457b9d;
     }
     button:disabled {
       background: #aaa;
       cursor: not-allowed;
     }
-    .mensaje {
-      text-align: center;
-      padding: 10px;
-      border-radius: 6px;
-      margin-top: 10px;
+    p {
+      font-size: 14px; 
+      margin-top: 15px;
+      color: #444;
     }
-    .ok { background: #a8dadc; color: #1d3557; }
-    .error { background: #e63946; color: white; }
   </style>
 </head>
 <body>
-  <h2>🎉 Cena de Fin de Año 🎉</h2>
+  <div class="container">
+    <h2>🎉 Cena de Fin de Año 🎉</h2>
 
-  <form id="form">
-    <label>DNI</label>
-    <input type="text" name="dni" id="dni" placeholder="Ej: 12345678" required />
+    <form id="form">
+      <label for="dni">DNI</label>
+      <input type="text" name="dni" id="dni" placeholder="Ej: 12345678" required />
 
-    <div id="validacion" class="mensaje" style="display:none;"></div>
+      <label for="nombre">Nombre y Apellido</label>
+      <input type="text" name="nombre" placeholder="Tu nombre completo" required />
 
-    <label>Nombre y Apellido</label>
-    <input type="text" name="nombre" placeholder="Tu nombre completo" required />
+      <label for="correo">Correo electrónico</label>
+      <input type="email" name="correo" placeholder="tu@mail.com" required />
 
-    <label>Correo electrónico</label>
-    <input type="email" name="correo" placeholder="tu@mail.com" required />
+      <label for="lugar">Lugar de trabajo</label>
+      <input type="text" name="lugar" placeholder="Ej: Rectorado" required />
 
-    <label>Lugar de trabajo</label>
-    <input type="text" name="lugar" placeholder="Ej: Rectorado" required />
+      <label for="opciones">Cantidad de opciones</label>
+      <input type="number" name="opciones" min="0" placeholder="Ej: 1" required />
 
-    <label>Cantidad de opciones</label>
-    <input type="number" name="opciones" min="0" placeholder="Ej: 1" required />
+      <p>✅ Al completar este formulario, aceptás el descuento del total de las opciones seleccionadas por planilla de haberes, en cuatro cuotas.</p>
 
-    <p style="font-size:14px; margin-top:10px;">
-      ✅ Al completar este formulario, aceptás el descuento del total de las opciones seleccionadas por planilla de haberes, en cuatro cuotas.
-    </p>
-
-    <button type="submit" id="submitBtn" disabled>Enviar inscripción</button>
-  </form>
-
-  <div id="resultado" class="mensaje" style="display:none;"></div>
+      <button type="submit" id="submitBtn" disabled>Enviar inscripción</button>
+    </form>
+  </div>
 
   <script>
     // 🔁 CONFIGURAR ESTOS VALORES ANTES DE USAR
@@ -88,7 +108,6 @@
     };
 
     const dniInput = document.getElementById("dni");
-    const validacionDiv = document.getElementById("validacion");
     const submitBtn = document.getElementById("submitBtn");
 
     // ✅ Validar DNI automáticamente
@@ -96,20 +115,33 @@
       const dni = dniInput.value.trim();
       if (!dni) return;
 
-      validacionDiv.style.display = "block";
-      validacionDiv.className = "mensaje";
-      validacionDiv.textContent = "🔎 Verificando DNI...";
+      Swal.fire({
+        title: "Verificando...",
+        text: "Chequeando autorización del DNI...",
+        didOpen: () => Swal.showLoading(),
+        allowOutsideClick: false,
+      });
 
       const resp = await fetch(`${SUPABASE_URL}/rest/v1/invitados?dni=eq.${dni}`, { headers: HEADERS });
       const data = await resp.json();
 
+      Swal.close();
+
       if (data.length > 0) {
-        validacionDiv.textContent = "✅ DNI autorizado. Podés completar el formulario.";
-        validacionDiv.classList.add("ok");
+        Swal.fire({
+          icon: "success",
+          title: "✅ DNI autorizado",
+          text: "Podés completar el formulario.",
+          timer: 1800,
+          showConfirmButton: false
+        });
         submitBtn.disabled = false;
       } else {
-        validacionDiv.textContent = "❌ Este DNI no está autorizado para registrarse.";
-        validacionDiv.classList.add("error");
+        Swal.fire({
+          icon: "error",
+          title: "❌ DNI no autorizado",
+          text: "Este DNI no está habilitado para registrarse.",
+        });
         submitBtn.disabled = true;
       }
     });
@@ -120,13 +152,32 @@
       const formData = new FormData(e.target);
       const params = new URLSearchParams(formData);
 
+      Swal.fire({
+        title: "Enviando...",
+        text: "Registrando tu inscripción...",
+        didOpen: () => Swal.showLoading(),
+        allowOutsideClick: false,
+      });
+
       const res = await fetch(SCRIPT_URL, { method: "POST", body: params });
       const text = await res.text();
+      Swal.close();
 
-      const resultado = document.getElementById("resultado");
-      resultado.style.display = "block";
-      resultado.textContent = text.includes("✅") ? text : "❌ " + text;
-      resultado.className = "mensaje " + (text.includes("✅") ? "ok" : "error");
+      if (text.includes("✅")) {
+        Swal.fire({
+          icon: "success",
+          title: "Inscripción exitosa 🎉",
+          text: text,
+        });
+        e.target.reset();
+        submitBtn.disabled = true;
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Hubo un problema 😞",
+          text: text,
+        });
+      }
     });
   </script>
 </body>
