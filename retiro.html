@@ -190,20 +190,38 @@
       }).then(async (result) => {
         if (!result.isConfirmed) return;
 
-        const resp = await fetch(
-          `https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec?action=retirar&dni=${dni}&opciones=${opciones}`,
-          { method: "POST" }
-        );
+        // 🌀 Mostramos un loader mientras se procesa
+        Swal.fire({
+          title: "Confirmando retiro...",
+          text: "Por favor esperá unos segundos ⏳",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => Swal.showLoading()
+        });
 
-        const text = await resp.text();
+        try {
+          const resp = await fetch(
+            `https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec?action=retirar&dni=${dni}&opciones=${opciones}`,
+            { method: "POST" }
+          );
 
-        if (text.includes("✅")) {
-          Swal.fire("✅ Retiro confirmado", "El retiro fue registrado correctamente.", "success");
-        } else {
-          Swal.fire("❌ Error", text, "error");
+          const text = await resp.text();
+
+          Swal.close(); // cerramos el loader
+
+          if (text.includes("✅")) {
+            Swal.fire("✅ Retiro confirmado", "El retiro fue registrado correctamente.", "success");
+          } else {
+            Swal.fire("❌ Error", text, "error");
+          }
+        } catch (err) {
+          Swal.close();
+          Swal.fire("❌ Error", "Ocurrió un error al procesar la solicitud.", "error");
+          console.error(err);
         }
       });
     }
+
   </script>
 </body>
 </html>
