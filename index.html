@@ -1,53 +1,106 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Sorteo – Cena de Fin de Año 🎉</title>
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-    const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ"; // seguro usar anon en frontend
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    async function sortear() {
-      const { data, error } = await supabase
-        .from("inscriptos")
-        .select("*")
-        .eq("sorteado", false);
-
-      if (error) {
-        alert("Error consultando inscriptos");
-        console.error(error);
-        return;
-      }
-
-      if (!data.length) {
-        alert("No quedan inscriptos para sortear.");
-        return;
-      }
-
-      const ganador = data[Math.floor(Math.random() * data.length)];
-
-      // Mostrar en pantalla
-      document.getElementById("ganador").innerHTML =
-        `🎉 <b>${ganador.nombre}</b> (DNI: ${ganador.dni})`;
-
-      // Marcarlo como sorteado en la base
-      const { error: updError } = await supabase
-        .from("inscriptos")
-        .update({ sorteado: true })
-        .eq("id", ganador.id);
-
-      if (updError) console.error(updError);
-    }
-
-    window.sortear = sortear;
-  </script>
+  <meta charset="UTF-8" />
+  <title>Inscripción Cena 🎉</title>
+  <style>
+    body { font-family: system-ui, Arial; max-width: 600px; margin: 2rem auto; padding: 1rem; }
+    form { display: flex; flex-direction: column; gap: 1rem; }
+    label { font-weight: bold; }
+    input, select { padding: 0.5rem; font-size: 1rem; }
+    button { padding: 0.7rem; font-size: 1rem; background: #457b9d; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #1d3557; }
+    .info { font-size: 0.9rem; color: #555; }
+  </style>
 </head>
-<body style="font-family: sans-serif; text-align: center; padding: 40px;">
-  <h1>🎲 Sorteo – Cena de Fin de Año</h1>
-  <button onclick="sortear()" style="font-size: 20px; padding: 12px 24px;">Sortear Ganador</button>
-  <div id="ganador" style="margin-top: 30px; font-size: 24px;"></div>
+<body>
+  <h1>Formulario de Inscripción – Cena de Fin de Año 🎉</h1>
+
+  <form id="inscripcionForm">
+    <div>
+      <label>Nombre y Apellido</label>
+      <input type="text" id="nombre" required />
+    </div>
+
+    <div>
+      <label>DNI</label>
+      <input type="text" id="dni" required />
+    </div>
+
+    <div>
+      <label>Correo electrónico</label>
+      <input type="email" id="correo" required />
+    </div>
+
+    <div>
+      <label>Lugar de trabajo</label>
+      <input type="text" id="lugar" required />
+    </div>
+
+    <div>
+      <label>Cantidad de opciones</label>
+      <input type="number" id="cantidad" min="1" value="1" required />
+      <p class="info">💰 Precio por opción: $40.000</p>
+    </div>
+
+    <div>
+      <label>
+        <input type="checkbox" id="acepto" required />
+        Acepto que el valor total se descuente por planilla de haberes en 4 cuotas
+      </label>
+    </div>
+
+    <button type="submit">Enviar inscripción</button>
+  </form>
+
+  <p id="out"></p>
+
+  <script>
+    const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxKjO6AmgHRwFeMe5YwSnyl9MIqWg6KFF-rTOyUg7PM9kK5rS83BwsL9EF1JU655mF/exec"; // ⚠️ tu WebApp
+
+    document.getElementById("inscripcionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        nombre: document.getElementById("nombre").value.trim(),
+        dni: document.getElementById("dni").value.trim(),
+        correo: document.getElementById("correo").value.trim(),
+        lugar: document.getElementById("lugar").value.trim(),
+        cantidad: parseInt(document.getElementById("cantidad").value, 10)
+      };
+
+      try {
+        // 1) Guardar en Supabase
+        let res1 = await fetch(`${SUPABASE_URL}/rest/v1/inscriptos`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + SUPABASE_KEY,
+            "Prefer": "return=minimal"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res1.ok) throw new Error("Error guardando en Supabase");
+
+        // 2) Mandar correo vía Google Script
+        let res2 = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        if (!res2.ok) throw new Error("Error enviando correo");
+
+        document.getElementById("out").textContent = "✅ Inscripción enviada. Revisá tu correo.";
+        e.target.reset();
+      } catch (err) {
+        console.error(err);
+        document.getElementById("out").textContent = "❌ Hubo un problema: " + err.message;
+      }
+    });
+  </script>
 </body>
 </html>

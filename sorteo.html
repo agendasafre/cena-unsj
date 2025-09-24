@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sorteo – Cena de Fin de Año 🎉</title>
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ"; // seguro usar anon en frontend
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function sortear() {
+      const { data, error } = await supabase
+        .from("inscriptos")
+        .select("*")
+        .eq("sorteado", false);
+
+      if (error) {
+        alert("Error consultando inscriptos");
+        console.error(error);
+        return;
+      }
+
+      if (!data.length) {
+        alert("No quedan inscriptos para sortear.");
+        return;
+      }
+
+      const ganador = data[Math.floor(Math.random() * data.length)];
+
+      // Mostrar en pantalla
+      document.getElementById("ganador").innerHTML =
+        `🎉 <b>${ganador.nombre}</b> (DNI: ${ganador.dni})`;
+
+      // Marcarlo como sorteado en la base
+      const { error: updError } = await supabase
+        .from("inscriptos")
+        .update({ sorteado: true })
+        .eq("id", ganador.id);
+
+      if (updError) console.error(updError);
+    }
+
+    window.sortear = sortear;
+  </script>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 40px;">
+  <h1>🎲 Sorteo – Cena de Fin de Año</h1>
+  <button onclick="sortear()" style="font-size: 20px; padding: 12px 24px;">Sortear Ganador</button>
+  <div id="ganador" style="margin-top: 30px; font-size: 24px;"></div>
+</body>
+</html>
