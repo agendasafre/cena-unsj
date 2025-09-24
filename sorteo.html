@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>Sorteo – Cena 🎉</title>
+<script type="module">
+const RAFFLE_FN_URL = "https://<project-ref>.functions.supabase.co/raffle";
+
+async function sortear() {
+  const res = await fetch(RAFFLE_FN_URL, { method: 'GET' });
+  if (!res.ok) { document.getElementById('out').textContent = "❌ Error"; return; }
+  const ganador = await res.json();
+  if (!ganador) { document.getElementById('out').textContent = "🎉 No quedan asistentes para sortear"; return; }
+  document.getElementById('out').textContent =
+    `🎉 Ganador: ${ganador.nombre} (DNI ${ganador.dni}) – ${ganador.rol}${ganador.lugar ? ' – ' + ganador.lugar : ''}`;
+}
+window.sortear = sortear;
+</script>
+<style>
+body { font-family: system-ui, Arial; max-width: 600px; margin: 24px auto; text-align:center; }
+button { padding:12px 16px; font-size:16px; }
+#out { margin-top:16px; font-weight:bold; }
+</style>
+</head>
+<body>
+<h1>Sorteo</h1>
+<button onclick="sortear()">🎁 Sortear siguiente</button>
+<div id="out">—</div>
+</body>
+</html>

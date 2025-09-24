@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Registro – Cena 🎉</title>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
+const SUPABASE_ANON_KEY = "TU-ANON-KEY";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// UI dinámica para acompañantes
+function addCompRow() {
+  const div = document.createElement('div');
+  div.className = 'comp';
+  div.innerHTML = `
+    <input placeholder="Nombre acompañante" class="comp-nombre" />
+    <input placeholder="DNI acompañante" class="comp-dni" />
+    <button type="button" onclick="this.parentElement.remove()">🗑</button>
+  `;
+  document.getElementById('companeros').appendChild(div);
+}
+window.addCompRow = addCompRow;
+
+async function registrar() {
+  const nombre = document.getElementById('emp-nombre').value.trim();
+  const dni    = document.getElementById('emp-dni').value.trim();
+  const correo = document.getElementById('emp-correo').value.trim();
+  const lugar  = document.getElementById('emp-lugar').value.trim();
+
+  if (!nombre || !dni || !correo) { alert("Completá nombre, DNI y correo"); return; }
+
+  // 1) Empleado
+  const { data: emp, error: e1 } = await supabase
+    .from('asistentes')
+    .insert([{ rol: 'empleado', nombre, dni, correo, lugar }])
+    .select()
+    .single();
+
+  if (e1) { alert("Error empleado: " + e1.message); return; }
+
+  // 2) Acompañantes
+  const comps = Array.from(document.querySelectorAll('.comp')).map(c => ({
+    nombre: c.querySelector('.comp-nombre').value.trim(),
+    dni:    c.querySelector('.comp-dni').value.trim()
+  })).filter(x => x.nombre && x.dni);
+
+  if (comps.length) {
+    const rows = comps.map(c => ({
+      rol: 'acompanante',
+      parent_id: emp.id,
+      nombre: c.nombre,
+      dni: c.dni
+    }));
+    const { error: e2 } = await supabase.from('asistentes').insert(rows);
+    if (e2) { alert("Error acompañantes: " + e2.message); return; }
+  }
+
+  alert("✅ Registrado. ¡Nos vemos en la fiesta!");
+  document.getElementById('form').reset();
+  document.getElementById('companeros').innerHTML = '';
+}
+
+window.registrar = registrar;
+</script>
+<style>
+body { font-family: system-ui, Arial; max-width: 600px; margin: 30px auto; }
+label { display:block; margin-top:10px; }
+.comp { display:flex; gap:8px; margin:6px 0; }
+.comp input { flex:1; }
+</style>
+</head>
+<body>
+<h1>Registro – Cena de Fin de Año 🎉</h1>
+
+<div id="form">
+  <label>Nombre y Apellido *</label>
+  <input id="emp-nombre" />
+
+  <label>DNI *</label>
+  <input id="emp-dni" />
+
+  <label>Correo *</label>
+  <input id="emp-correo" />
+
+  <label>Lugar de trabajo</label>
+  <input id="emp-lugar" />
+
+  <h3>Acompañantes</h3>
+  <div id="companeros"></div>
+  <button type="button" onclick="addCompRow()">+ Agregar acompañante</button>
+
+  <div style="margin-top:16px">
+    <button onclick="registrar()">Enviar</button>
+  </div>
+</div>
+</body>
+</html>
