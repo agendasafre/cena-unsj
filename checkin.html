@@ -8,7 +8,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
-const CHECKIN_FN_URL = "https://<project-ref>.functions.supabase.co/checkin"; // Edge Function
+const CHECKIN_FN_URL = "https://dlitmctfjzmedssrbazs.functions.supabase.co/checkin"; // Edge Function
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let persona = null;

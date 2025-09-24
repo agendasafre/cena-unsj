@@ -8,6 +8,18 @@ const SERVICE_ROLE = Deno.env.get("SERVICE_ROLE_KEY")!;
 const CONTROL_PIN = Deno.env.get("CONTROL_PIN")!;
 
 serve(async (req) => {
+
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",       // ⚠️ podés restringir a tu dominio si querés
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+
+  // Manejo de preflight (OPTIONS)
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+  
   try {
     if (req.method !== "POST") {
       return new Response("Method not allowed", { status: 405 });
