@@ -1,57 +1,130 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Sorteo – Cena de Fin de Año 🎉</title>
+  <meta charset="UTF-8" />
+  <title>🎲 Sorteo – Cena de Fin de Año</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1d3557, #457b9d);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px #000;
+    }
+    button {
+      font-size: 20px;
+      padding: 15px 35px;
+      border: none;
+      border-radius: 12px;
+      background: #e63946;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    button:hover {
+      background: #ff4d5a;
+      transform: scale(1.05);
+    }
+    #ganador {
+      margin-top: 40px;
+      font-size: 2rem;
+      font-weight: bold;
+      text-shadow: 2px 2px #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎲 Sorteo – Cena de Fin de Año</h1>
+  <button onclick="sortear()">Sortear Ganador</button>
+  <div id="ganador"></div>
+
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ"; // seguro usar anon en frontend
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    async function sortear() {
+    window.sortear = async function () {
+      Swal.fire({
+        title: "Preparando el sorteo...",
+        text: "Buscando participantes elegibles 🎟️",
+        didOpen: () => Swal.showLoading(),
+        allowOutsideClick: false,
+      });
+
       const { data, error } = await supabase
-        .from("invitados") // 👈 ajustá el nombre si tu tabla se llama distinto
+        .from("invitados")
         .select("*")
         .eq("sorteado", false)
         .eq("estado", "inscripto")
         .eq("retiro", true);
 
+      Swal.close();
+
       if (error) {
-        alert("⚠️ Error consultando los inscriptos elegibles para el sorteo.");
+        Swal.fire("⚠️ Error", "No se pudo consultar la base de datos.", "error");
         console.error(error);
         return;
       }
 
       if (!data || data.length === 0) {
-        alert("🙅‍♂️ No quedan personas elegibles para sortear.");
+        Swal.fire("🙅‍♂️ Sin participantes", "No quedan personas elegibles para sortear.", "info");
         return;
       }
 
+      // 🎲 Efecto suspenso
+      Swal.fire({
+        title: "¡Sorteando!",
+        text: "Redoblantes por favor...🥁",
+        timer: 3000,
+        timerProgressBar: true,
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+      });
+
+      await new Promise(res => setTimeout(res, 3200));
+
       const ganador = data[Math.floor(Math.random() * data.length)];
 
-      // Mostrar en pantalla
+      // 🎉 Mostrar al ganador
+      Swal.fire({
+        icon: "success",
+        title: "🎉 ¡Tenemos ganador/a!",
+        html: `<h2>${ganador.nombre}</h2>`,
+        confirmButtonText: "¡Felicitalo/a! 🎊",
+      });
+
       document.getElementById("ganador").innerHTML = `
-        🎉 <h2>El/La ganador/a es...</h2>
-        <h1><b>${ganador.nombre}</b></h1>
+        🎉 El/La ganador/a es:<br>
+        <span style="font-size:2.2rem">${ganador.nombre}</span>
       `;
 
-      // Marcarlo como sorteado en la base
+      // 🛠️ Marcar como sorteado
       const { error: updError } = await supabase
         .from("invitados")
         .update({ sorteado: true })
         .eq("id", ganador.id);
 
-      if (updError) console.error(updError);
+      if (updError) {
+        console.error(updError);
+        Swal.fire("⚠️ Error", "No se pudo actualizar el estado del ganador.", "error");
+      }
     }
-
-    window.sortear = sortear;
   </script>
-</head>
-<body style="font-family: sans-serif; text-align: center; padding: 40px;">
-  <h1>🎲 Sorteo – Cena de Fin de Año</h1>
-  <button onclick="sortear()" style="font-size: 20px; padding: 12px 24px;">Sortear Ganador</button>
-  <div id="ganador" style="margin-top: 30px; font-size: 24px;"></div>
 </body>
 </html>
