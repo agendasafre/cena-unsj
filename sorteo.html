@@ -36,7 +36,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     button:hover {
-      background: #ff4d5a;
+      background: white;
       transform: scale(1.05);
     }
     #ganador {
@@ -64,10 +64,8 @@
       Swal.fire({
         title: "Preparando el sorteo...",
         text: "Revolviendo el bombo...🎟️",
-        timer: 2000,
-        timerProgressBar: true,
-        allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
+        allowOutsideClick: false,
       });
 
       const { data, error } = await supabase
