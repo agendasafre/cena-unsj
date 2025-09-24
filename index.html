@@ -2,104 +2,131 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Inscripción Cena 🎉</title>
+  <title>Registro - Cena de Fin de Año 🎉</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: system-ui, Arial; max-width: 600px; margin: 2rem auto; padding: 1rem; }
-    form { display: flex; flex-direction: column; gap: 1rem; }
-    label { font-weight: bold; }
-    input, select { padding: 0.5rem; font-size: 1rem; }
-    button { padding: 0.7rem; font-size: 1rem; background: #457b9d; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    button:hover { background: #1d3557; }
-    .info { font-size: 0.9rem; color: #555; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h2 { text-align: center; }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #1d3557;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    .mensaje {
+      text-align: center;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+    .ok { background: #a8dadc; color: #1d3557; }
+    .error { background: #e63946; color: white; }
   </style>
 </head>
 <body>
-  <h1>Formulario de Inscripción – Cena de Fin de Año 🎉</h1>
+  <h2>🎉 Cena de Fin de Año 🎉</h2>
 
-  <form id="inscripcionForm">
-    <div>
-      <label>Nombre y Apellido</label>
-      <input type="text" id="nombre" required />
-    </div>
+  <form id="form">
+    <label>DNI</label>
+    <input type="text" name="dni" id="dni" placeholder="Ej: 12345678" required />
 
-    <div>
-      <label>DNI</label>
-      <input type="text" id="dni" required />
-    </div>
+    <div id="validacion" class="mensaje" style="display:none;"></div>
 
-    <div>
-      <label>Correo electrónico</label>
-      <input type="email" id="correo" required />
-    </div>
+    <label>Nombre y Apellido</label>
+    <input type="text" name="nombre" placeholder="Tu nombre completo" required />
 
-    <div>
-      <label>Lugar de trabajo</label>
-      <input type="text" id="lugar" required />
-    </div>
+    <label>Correo electrónico</label>
+    <input type="email" name="correo" placeholder="tu@mail.com" required />
 
-    <div>
-      <label>Cantidad de opciones</label>
-      <input type="number" id="cantidad" min="1" value="1" required />
-      <p class="info">💰 Precio por opción: $40.000</p>
-    </div>
+    <label>Lugar de trabajo</label>
+    <input type="text" name="lugar" placeholder="Ej: Rectorado" required />
 
-    <div>
-      <label>
-        <input type="checkbox" id="acepto" required />
-        Acepto que el valor total se descuente por planilla de haberes en 4 cuotas
-      </label>
-    </div>
+    <label>Cantidad de opciones</label>
+    <input type="number" name="opciones" min="0" placeholder="Ej: 1" required />
 
-    <button type="submit">Enviar inscripción</button>
+    <p style="font-size:14px; margin-top:10px;">
+      ✅ Al completar este formulario, aceptás el descuento del total de las opciones seleccionadas por planilla de haberes, en cuatro cuotas.
+    </p>
+
+    <button type="submit" id="submitBtn" disabled>Enviar inscripción</button>
   </form>
 
-  <p id="out"></p>
+  <div id="resultado" class="mensaje" style="display:none;"></div>
 
   <script>
+    // 🔁 CONFIGURAR ESTOS VALORES ANTES DE USAR
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec"; // Apps Script WebApp
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxKjO6AmgHRwFeMe5YwSnyl9MIqWg6KFF-rTOyUg7PM9kK5rS83BwsL9EF1JU655mF/exec"; // ⚠️ tu WebApp
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
 
-    document.getElementById("inscripcionForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    const HEADERS = {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: "Bearer " + SUPABASE_ANON_KEY,
+    };
 
-      const payload = {
-        nombre: document.getElementById("nombre").value.trim(),
-        dni: document.getElementById("dni").value.trim(),
-        correo: document.getElementById("correo").value.trim(),
-        lugar: document.getElementById("lugar").value.trim(),
-        cantidad: parseInt(document.getElementById("cantidad").value, 10)
-      };
+    const dniInput = document.getElementById("dni");
+    const validacionDiv = document.getElementById("validacion");
+    const submitBtn = document.getElementById("submitBtn");
 
-      try {
-        // 1) Guardar en Supabase
-        let res1 = await fetch(`${SUPABASE_URL}/rest/v1/inscriptos`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_KEY,
-            "Authorization": "Bearer " + SUPABASE_KEY,
-            "Prefer": "return=minimal"
-          },
-          body: JSON.stringify(payload)
-        });
+    // ✅ Validar DNI automáticamente
+    dniInput.addEventListener("blur", async () => {
+      const dni = dniInput.value.trim();
+      if (!dni) return;
 
-        if (!res1.ok) throw new Error("Error guardando en Supabase");
+      validacionDiv.style.display = "block";
+      validacionDiv.className = "mensaje";
+      validacionDiv.textContent = "🔎 Verificando DNI...";
 
-        // 2) Mandar correo vía Google Script
-        let res2 = await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify(payload)
-        });
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/invitados?dni=eq.${dni}`, { headers: HEADERS });
+      const data = await resp.json();
 
-        if (!res2.ok) throw new Error("Error enviando correo");
-
-        document.getElementById("out").textContent = "✅ Inscripción enviada. Revisá tu correo.";
-        e.target.reset();
-      } catch (err) {
-        console.error(err);
-        document.getElementById("out").textContent = "❌ Hubo un problema: " + err.message;
+      if (data.length > 0) {
+        validacionDiv.textContent = "✅ DNI autorizado. Podés completar el formulario.";
+        validacionDiv.classList.add("ok");
+        submitBtn.disabled = false;
+      } else {
+        validacionDiv.textContent = "❌ Este DNI no está autorizado para registrarse.";
+        validacionDiv.classList.add("error");
+        submitBtn.disabled = true;
       }
+    });
+
+    // 📤 Enviar datos al Apps Script
+    document.getElementById("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const params = new URLSearchParams(formData);
+
+      const res = await fetch(SCRIPT_URL, { method: "POST", body: params });
+      const text = await res.text();
+
+      const resultado = document.getElementById("resultado");
+      resultado.style.display = "block";
+      resultado.textContent = text.includes("✅") ? text : "❌ " + text;
+      resultado.className = "mensaje " + (text.includes("✅") ? "ok" : "error");
     });
   </script>
 </body>

@@ -12,30 +12,34 @@
 
     async function sortear() {
       const { data, error } = await supabase
-        .from("inscriptos")
+        .from("invitados") // 👈 ajustá el nombre si tu tabla se llama distinto
         .select("*")
-        .eq("sorteado", false);
+        .eq("sorteado", false)
+        .eq("estado", "inscripto")
+        .eq("retiro", true);
 
       if (error) {
-        alert("Error consultando inscriptos");
+        alert("⚠️ Error consultando los inscriptos elegibles para el sorteo.");
         console.error(error);
         return;
       }
 
-      if (!data.length) {
-        alert("No quedan inscriptos para sortear.");
+      if (!data || data.length === 0) {
+        alert("🙅‍♂️ No quedan personas elegibles para sortear.");
         return;
       }
 
       const ganador = data[Math.floor(Math.random() * data.length)];
 
       // Mostrar en pantalla
-      document.getElementById("ganador").innerHTML =
-        `🎉 <b>${ganador.nombre}</b> (DNI: ${ganador.dni})`;
+      document.getElementById("ganador").innerHTML = `
+        🎉 <h2>El/La ganador/a es...</h2>
+        <h1><b>${ganador.nombre}</b></h1>
+      `;
 
       // Marcarlo como sorteado en la base
       const { error: updError } = await supabase
-        .from("inscriptos")
+        .from("invitados")
         .update({ sorteado: true })
         .eq("id", ganador.id);
 

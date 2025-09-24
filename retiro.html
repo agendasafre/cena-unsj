@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Retiro de entradas</title>
+</head>
+<body>
+  <h2>🎟️ Retiro de Entradas</h2>
+  <form id="buscarForm">
+    <input type="text" name="dni" placeholder="DNI" required />
+    <button type="submit">Buscar</button>
+  </form>
+
+  <div id="info"></div>
+
+  <script>
+    const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
+    const HEADERS = {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: "Bearer " + SUPABASE_ANON_KEY,
+    };
+
+    document.getElementById("buscarForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const dni = e.target.dni.value.trim();
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/invitados?dni=eq.${dni}`, { headers: HEADERS });
+      const data = await res.json();
+      if (!data.length) {
+        document.getElementById("info").textContent = "❌ No se encontró ese DNI.";
+        return;
+      }
+
+      const inv = data[0];
+      document.getElementById("info").innerHTML = `
+        <p><b>Nombre:</b> ${inv.nombre}</p>
+        <p><b>Correo:</b> ${inv.correo}</p>
+        <p><b>Lugar:</b> ${inv.lugar_trabajo}</p>
+        <p><b>Opciones:</b> <input type="number" id="opciones" value="${inv.opciones || 0}" /></p>
+        <p><b>Retiro:</b> ${inv.retiro ? "✅ Sí" : "❌ No"}</p>
+        <button onclick="marcarRetiro('${dni}')">✅ Confirmar retiro</button>
+      `;
+    });
+
+    async function marcarRetiro(dni) {
+      const opciones = document.getElementById("opciones").value;
+      const resp = await fetch(
+        `https://script.google.com/macros/s/TU_SCRIPT_ID/exec?dni=${dni}&opciones=${opciones}`,
+        { method: "POST" }
+      );
+      alert(await resp.text());
+    }
+  </script>
+</body>
+</html>
