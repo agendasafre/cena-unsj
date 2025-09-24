@@ -90,9 +90,9 @@
       <label for="opciones">Cantidad de opciones</label>
       <input type="number" name="opciones" min="0" placeholder="Ej: 1" required />
 
-      <p>✅ Al completar este formulario, aceptás el descuento del total de las opciones seleccionadas por planilla de haberes, en cuatro cuotas.</p>
+      <h3>Al completar este formulario, aceptás el descuento del total de las opciones seleccionadas por planilla de haberes, en cuatro cuotas.</h3>
 
-      <button type="submit" id="submitBtn" disabled>Enviar inscripción</button>
+      <button type="submit" id="submitBtn" disabled>Enviar</button>
     </form>
   </div>
 
@@ -108,6 +108,7 @@
     };
 
     const dniInput = document.getElementById("dni");
+    const nombreInput = document.getElementById("nombre");
     const submitBtn = document.getElementById("submitBtn");
 
     // ✅ Validar DNI automáticamente
@@ -116,8 +117,8 @@
       if (!dni) return;
 
       Swal.fire({
-        title: "Verificando...",
-        text: "Chequeando autorización del DNI...",
+        title: "Verificando DNI...",
+        text: "Por favor, esperá...",
         didOpen: () => Swal.showLoading(),
         allowOutsideClick: false,
       });
@@ -130,16 +131,17 @@
       if (data.length > 0) {
         Swal.fire({
           icon: "success",
-          title: "✅ DNI autorizado",
+          title: "DNI validado",
           text: "Podés completar el formulario.",
           timer: 1800,
           showConfirmButton: false
         });
         submitBtn.disabled = false;
+        nombreInput.focus();
       } else {
         Swal.fire({
           icon: "error",
-          title: "❌ DNI no autorizado",
+          title: "DNI no validado",
           text: "Este DNI no está habilitado para registrarse.",
         });
         submitBtn.disabled = true;
@@ -166,7 +168,7 @@
       if (text.includes("✅")) {
         Swal.fire({
           icon: "success",
-          title: "Inscripción exitosa 🎉",
+          title: "Registro exitoso 🎉",
           text: text,
         });
         e.target.reset();
