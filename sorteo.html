@@ -48,8 +48,9 @@
   </style>
 </head>
 <body>
-  <h1>🎲 Sorteo – Cena de Fin de Año</h1>
-  <button onclick="sortear()">Sortear Ganador</button>
+  <h1>Hay Cena de Fin de Años</h1>
+  <h2>¡Hay Sorteo!</h2>
+  <button onclick="sortear()">🎲 Sortear</button>
   <div id="ganador"></div>
 
   <script type="module">
@@ -62,9 +63,11 @@
     window.sortear = async function () {
       Swal.fire({
         title: "Preparando el sorteo...",
-        text: "Buscando participantes elegibles 🎟️",
-        didOpen: () => Swal.showLoading(),
+        text: "Revolviendo el bombo...🎟️",
+        timer: 2000,
+        timerProgressBar: true,
         allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
       });
 
       const { data, error } = await supabase
@@ -91,7 +94,7 @@
       Swal.fire({
         title: "¡Sorteando!",
         text: "Redoblantes por favor...🥁",
-        timer: 3000,
+        timer: 4500,
         timerProgressBar: true,
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
@@ -109,10 +112,10 @@
         confirmButtonText: "¡Felicitalo/a! 🎊",
       });
 
-      document.getElementById("ganador").innerHTML = `
-        🎉 El/La ganador/a es:<br>
-        <span style="font-size:2.2rem">${ganador.nombre}</span>
-      `;
+      // document.getElementById("ganador").innerHTML = `
+      //   🎉 El/La ganador/a es:<br>
+      //   <span style="font-size:2.2rem">${ganador.nombre}</span>
+      // `;
 
       // 🛠️ Marcar como sorteado
       const { error: updError } = await supabase
