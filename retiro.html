@@ -45,7 +45,7 @@
     async function marcarRetiro(dni) {
       const opciones = document.getElementById("opciones").value;
       const resp = await fetch(
-        `https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec?dni=${dni}&opciones=${opciones}`,
+        `https://script.google.com/macros/s/TU_SCRIPT_ID/exec?action=retirar&dni=${dni}&opciones=${opciones}`,
         { method: "POST" }
       );
       alert(await resp.text());
