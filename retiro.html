@@ -52,7 +52,7 @@
         <p><b>Estado:</b> ${inv.estado}</p>
         <p><b>Opciones:</b> <input type="number" id="opciones" value="${inv.opciones || 0}" /></p>
         <p><b>Retiro:</b> ${inv.retiro ? "✅ Sí" : "❌ No"}</p>
-        <button onclick="confirmarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
+        <button onclick="marcarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
       `;
     });
 
