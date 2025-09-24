@@ -34,6 +34,15 @@
       max-width: 450px;
       width: 100%;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 6px;
+      display: block;
     }
 
     input, button {
@@ -43,10 +52,17 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
+      box-sizing: border-box; /* 📏 evita que se salga del contenedor */
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #1d3557;
+      box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3);
     }
 
     button {
-      background: #e63946;
+      background: #1d3557; /* 🎨 Azul petróleo en lugar de rojo */
       color: white;
       font-size: 18px;
       cursor: pointer;
@@ -54,7 +70,7 @@
     }
 
     button:hover {
-      background: #ff4d5a;
+      background: #274a78;
       transform: scale(1.03);
     }
 
@@ -76,8 +92,17 @@
     }
 
     #info input {
-      width: 100px;
+      width: 120px;
       display: inline-block;
+    }
+
+    #info button {
+      background: #1d3557;
+      font-size: 17px;
+    }
+
+    #info button:hover {
+      background: #274a78;
     }
   </style>
 </head>
@@ -92,6 +117,7 @@
 
   <div id="info"></div>
 
+  <!-- 👇 Script idéntico al tuyo -->
   <script>
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
