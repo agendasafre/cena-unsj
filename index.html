@@ -68,6 +68,31 @@
       margin-top: 15px;
       color: #444;
     }
+
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fff;
+      color: #333;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #1d3557;
+      box-shadow: 0 0 0 3px rgba(69, 123, 157, 0.3);
+    }
+
+    select option[disabled] {
+      color: #999;
+    }
   </style>
 </head>
 <body>
@@ -85,7 +110,19 @@
       <input type="email" name="correo" placeholder="tu@mail.com" required />
 
       <label for="lugar">Lugar de trabajo</label>
-      <input type="text" name="lugar" placeholder="Ej: Rectorado" required />
+      <select name="lugar" id="lugar" required>
+        <option value="" disabled selected>Seleccioná tu lugar de trabajo</option>
+        <option value="Rectorado">Rectorado</option>
+        <option value="Facultad de Ciencias Exactas, Físicas y Naturales">Facultad de Ciencias Exactas, Físicas y Naturales</option>
+        <option value="Facultad de Ingeniería">Facultad de Ingeniería</option>
+        <option value="Facultad de Ciencias Sociales">Facultad de Ciencias Sociales</option>
+        <option value="Facultad de Filosofía, Humanidades y Artes">Facultad de Filosofía, Humanidades y Artes</option>
+        <option value="Facultad de Arquitectura, Urbanismo y Diseño">Facultad de Arquitectura, Urbanismo y Diseño</option>
+        <option value="Escuela Universitaria de Ciencias de la Salud">Escuela Universitaria de Ciencias de la Salud</option>
+        <option value='IPU - Escuela Industrial "Domingo F. Sarmiento"'>IPU - Escuela Industrial "Domingo F. Sarmiento"</option>
+        <option value='IPU - Escuela de Comercio "Lib. Gral. San Martín"'>IPU - Escuela de Comercio "Lib. Gral. San Martín"</option>
+        <option value='IPU - Colegio Central Universitario "Mariano Moreno"'>IPU - Colegio Central Universitario "Mariano Moreno"</option>
+      </select>
 
       <label for="opciones">Cantidad de opciones</label>
       <input type="number" name="opciones" min="0" placeholder="Ej: 1" required />
