@@ -208,6 +208,7 @@
             text: "Este DNI ya retiró su entrada. No es posible completar un nuevo registro.",
           });
           submitBtn.disabled = true;
+          submitBtn.textContent = "Enviar"; // volvemos al texto original por las dudas
           return;
         }
 
@@ -222,6 +223,7 @@
             confirmButtonText: "Entendido",
           });
           submitBtn.disabled = false;
+          submitBtn.textContent = "Actualizar registro ✏️";
           nombreInput.focus();
           return;
         }
@@ -235,6 +237,7 @@
           showConfirmButton: false
         });
         submitBtn.disabled = false;
+        submitBtn.textContent = "Enviar"; // vuelve al texto original
         nombreInput.focus();
 
       } else {
@@ -244,8 +247,8 @@
           text: "Este DNI no está habilitado para registrarse.",
         });
         submitBtn.disabled = true;
+        submitBtn.textContent = "Enviar"; // aseguramos que no quede "Actualizar" de antes
       }
-
     });
 
     document.getElementById("form").addEventListener("submit", async (e) => {
