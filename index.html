@@ -199,13 +199,53 @@
       Swal.close();
 
       if (data.length > 0) {
-        Swal.fire({ icon: "success", title: "DNI validado", text: "Podés completar el formulario.", timer: 1800, showConfirmButton: false });
+        const invitado = data[0];
+
+        if (invitado.retiro === true) {
+          Swal.fire({
+            icon: "warning",
+            title: "⚠️ Retiro ya registrado",
+            text: "Este DNI ya retiró su entrada. No es posible completar un nuevo registro.",
+          });
+          submitBtn.disabled = true;
+          return;
+        }
+
+        if (invitado.estado === "inscripto") {
+          Swal.fire({
+            icon: "info",
+            title: "ℹ️ Registro existente",
+            html: `
+              Este DNI ya se encuentra <b>inscripto</b> para la cena.<br><br>
+              Si completás el formulario y lo enviás nuevamente, <b>se actualizará la información existente</b> (nombre, correo, lugar o cantidad de opciones).
+            `,
+            confirmButtonText: "Entendido",
+          });
+          submitBtn.disabled = false;
+          nombreInput.focus();
+          return;
+        }
+
+        // 👇 Si no estaba inscripto y no retiró, es un registro nuevo
+        Swal.fire({
+          icon: "success",
+          title: "✅ DNI validado",
+          text: "Podés completar el formulario.",
+          timer: 1800,
+          showConfirmButton: false
+        });
         submitBtn.disabled = false;
         nombreInput.focus();
+
       } else {
-        Swal.fire({ icon: "error", title: "DNI no validado", text: "Este DNI no está habilitado para registrarse." });
+        Swal.fire({
+          icon: "error",
+          title: "❌ DNI no validado",
+          text: "Este DNI no está habilitado para registrarse.",
+        });
         submitBtn.disabled = true;
       }
+
     });
 
     document.getElementById("form").addEventListener("submit", async (e) => {
