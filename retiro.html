@@ -126,11 +126,29 @@
       apikey: SUPABASE_ANON_KEY,
       Authorization: "Bearer " + SUPABASE_ANON_KEY,
     };
+    const fechaLimite = new Date("2025-11-28T23:59:59");
+
+    function validarFechaLimite() {
+      const ahora = new Date();
+      if (ahora > fechaLimite) {
+        Swal.fire({
+          icon: "warning",
+          title: "⏰ Plazo finalizado",
+          text: "El período para registrarse o retirar entradas ha finalizado (28/11/2025).",
+          confirmButtonText: "Entendido"
+        });
+        return false;
+      }
+      return true;
+    }
 
     const infoDiv = document.getElementById("info");
 
     document.getElementById("buscarForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      if (!validarFechaLimite()) return;
+
       const dni = e.target.dni.value.trim();
       if (!dni) return;
 
@@ -173,12 +191,15 @@
         <p><b>Opciones:</b> 
           <input type="number" id="opciones" value="${inv.opciones || 0}" min="0" />
         </p>
-        <p><b>Retiro:</b> ${inv.retiro ? "✅ Sí" : "❌ No"}</p>
+        <p><b>Retiró:</b> ${inv.retiro ? "✅ Sí" : "❌ No"}</p>
         <button type="button" onclick="marcarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
       `;
     });
 
     async function marcarRetiro(dni) {
+
+      if (!validarFechaLimite()) return;
+
       const opciones = document.getElementById("opciones").value;
 
       Swal.fire({

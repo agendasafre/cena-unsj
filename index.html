@@ -186,8 +186,26 @@
     const dniInput = document.getElementById("dni");
     const nombreInput = document.getElementById("nombre");
     const submitBtn = document.getElementById("submitBtn");
+    const fechaLimite = new Date("2025-11-28T23:59:59");
+
+    function validarFechaLimite() {
+      const ahora = new Date();
+      if (ahora > fechaLimite) {
+        Swal.fire({
+          icon: "warning",
+          title: "⏰ Plazo finalizado",
+          text: "El período para registrarse o retirar entradas ha finalizado (28/11/2025).",
+          confirmButtonText: "Entendido"
+        });
+        return false;
+      }
+      return true;
+    }
 
     dniInput.addEventListener("blur", async () => {
+      
+      if (!validarFechaLimite()) return;
+      
       const dni = dniInput.value.trim();
       if (!dni) return;
 
