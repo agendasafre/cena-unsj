@@ -5,7 +5,6 @@
   <title>Registro - Cena de Fin de Año 🎉</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
@@ -18,29 +17,41 @@
       min-height: 100vh;
       padding: 20px;
     }
+
     .container {
       width: 100%;
-      max-width: 420px;
+      max-width: 450px;
     }
+
+    .logo {
+      display: block;
+      margin: 0 auto 15px;
+      width: 100px;
+      height: auto;
+    }
+
     h2 { 
       text-align: center; 
       color: #1d3557; 
       margin-bottom: 20px;
     }
+
     form {
       background: white;
-      padding: 20px;
+      padding: 25px;
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       box-sizing: border-box;
     }
+
     label {
       display: block;
       margin-top: 12px;
       font-weight: bold;
       color: #333;
     }
-    input, button {
+
+    input, select, button {
       width: 100%;
       padding: 12px;
       margin-top: 5px;
@@ -49,6 +60,7 @@
       border-radius: 6px;
       box-sizing: border-box;
     }
+
     button {
       background: #1d3557;
       color: white;
@@ -56,47 +68,65 @@
       margin-top: 20px;
       transition: background 0.2s;
     }
+
     button:hover:not(:disabled) {
       background: #457b9d;
     }
+
     button:disabled {
       background: #aaa;
       cursor: not-allowed;
     }
-    p {
-      font-size: 14px; 
-      margin-top: 15px;
-      color: #444;
+
+    .aviso-descuento {
+      background: #f1faee;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border-left: 5px solid #1d3557;
     }
 
-    select {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: #fff;
+    .aviso-descuento h3 {
+      margin: 0 0 10px;
+      color: #1d3557;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .aviso-descuento h3::before {
+      content: "⚠️";
+      font-size: 22px;
+    }
+
+    .aviso-descuento p {
+      font-size: 15px;
+      margin: 5px 0;
       color: #333;
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      cursor: pointer;
+      line-height: 1.4;
     }
 
-    select:focus {
-      outline: none;
-      border-color: #1d3557;
-      box-shadow: 0 0 0 3px rgba(69, 123, 157, 0.3);
+    .precio-opcion::before {
+      content: "💰";
+      margin-right: 4px;
     }
 
-    select option[disabled] {
-      color: #999;
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .footer p {
+      margin: 0;
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <img src="./assets/logo.webp" alt="Logo UNSJ" class="logo" />
     <h2>🎉 Cena de Fin de Año 🎉</h2>
 
     <form id="form">
@@ -127,38 +157,41 @@
       <label for="opciones">Cantidad de opciones</label>
       <input type="number" name="opciones" min="1" placeholder="Ej: 1" required />
 
-      <h3>Al completar este formulario, aceptás el descuento del total de las opciones seleccionadas por planilla de haberes, en cuatro cuotas.</h3>
+      <div class="aviso-descuento">
+        <h3>Importante</h3>
+        <p>
+          Al enviar este formulario, confirmás que aceptás el descuento del <strong>total de las opciones seleccionadas</strong> directamente por <strong>planilla de haberes</strong>, dividido en <strong>4 cuotas iguales</strong>.
+        </p>
+        <p class="precio-opcion">
+          El valor de <strong>cada opción</strong> es de <strong>$40.000</strong>.
+        </p>
+      </div>
 
       <button type="submit" id="submitBtn" disabled>Enviar</button>
     </form>
+
+    <footer class="footer">
+      <p>© <span id="anio"></span> Universidad Nacional de San Juan – Rectorado</p>
+    </footer>
+
   </div>
 
   <script>
-    // 🔁 CONFIGURAR ESTOS VALORES ANTES DE USAR
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec"; // Apps Script WebApp
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec";
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
 
-    const HEADERS = {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: "Bearer " + SUPABASE_ANON_KEY,
-    };
+    const HEADERS = { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY };
 
     const dniInput = document.getElementById("dni");
     const nombreInput = document.getElementById("nombre");
     const submitBtn = document.getElementById("submitBtn");
 
-    // ✅ Validar DNI automáticamente
     dniInput.addEventListener("blur", async () => {
       const dni = dniInput.value.trim();
       if (!dni) return;
 
-      Swal.fire({
-        title: "Verificando DNI...",
-        text: "Por favor, esperá...",
-        didOpen: () => Swal.showLoading(),
-        allowOutsideClick: false,
-      });
+      Swal.fire({ title: "Verificando DNI...", text: "Por favor, esperá...", didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
       const resp = await fetch(`${SUPABASE_URL}/rest/v1/invitados?dni=eq.${dni}`, { headers: HEADERS });
       const data = await resp.json();
@@ -166,59 +199,36 @@
       Swal.close();
 
       if (data.length > 0) {
-        Swal.fire({
-          icon: "success",
-          title: "DNI validado",
-          text: "Podés completar el formulario.",
-          timer: 1800,
-          showConfirmButton: false
-        });
+        Swal.fire({ icon: "success", title: "DNI validado", text: "Podés completar el formulario.", timer: 1800, showConfirmButton: false });
         submitBtn.disabled = false;
         nombreInput.focus();
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "DNI no validado",
-          text: "Este DNI no está habilitado para registrarse.",
-        });
+        Swal.fire({ icon: "error", title: "DNI no validado", text: "Este DNI no está habilitado para registrarse." });
         submitBtn.disabled = true;
       }
     });
 
-    // 📤 Enviar datos al Apps Script
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const params = new URLSearchParams(formData).toString();
 
-      Swal.fire({
-        title: "Enviando...",
-        text: "Registrando tu inscripción...",
-        didOpen: () => Swal.showLoading(),
-        allowOutsideClick: false,
-      });
+      Swal.fire({ title: "Enviando...", text: "Registrando tu inscripción...", didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
       const res = await fetch(`${SCRIPT_URL}?${params}`, { method: "POST" });
       const text = await res.text();
-
       Swal.close();
 
       if (text.includes("✅")) {
-        Swal.fire({
-          icon: "success",
-          title: "Registro exitoso 🎉",
-          text: text,
-        });
+        Swal.fire({ icon: "success", title: "Registro exitoso 🎉", text });
         e.target.reset();
         submitBtn.disabled = true;
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Hubo un problema 😞",
-          text: text,
-        });
+        Swal.fire({ icon: "error", title: "Hubo un problema 😞", text });
       }
     });
+
+    document.getElementById("anio").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
