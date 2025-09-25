@@ -101,7 +101,7 @@
       border: none;
       cursor: pointer;
       color: #0d2b57;
-      background: #a8dadc; /* celeste suave */
+      background: #dbecfa; /* celeste suave */
       box-shadow: 0 6px 18px rgba(0,0,0,.25);
       transition: transform .08s ease, box-shadow .2s ease, filter .2s ease, background .3s ease;
     }
@@ -194,8 +194,6 @@
     <div class="controls">
       <button id="btnStart" class="btn">🎲 Iniciar sorteo</button>
     </div>
-
-    <div class="footer">Participan únicamente quienes retiraron su entrada.</div>
   </div>
 
   <!-- 🏆 Overlay de ganador -->
@@ -369,13 +367,13 @@
       running = false;
     }
 
-    function nextRound() {
+    async function nextRound() {
       btnNext.disabled = true;
       hideWinner();
       slotText.textContent = "Listo para sortear…";
-      // Habilitamos de nuevo el botón principal
-      btnStart.disabled = false;
-      btnStart.textContent = "🎲 Sortear otro";
+      // Reiniciamos el estado y lanzamos directamente el siguiente sorteo
+      await sleep(500); // pequeño respiro visual
+      startSorteo();
     }
 
     // Eventos
