@@ -125,7 +125,7 @@
       </select>
 
       <label for="opciones">Cantidad de opciones</label>
-      <input type="number" name="opciones" min="0" placeholder="Ej: 1" required />
+      <input type="number" name="opciones" min="1" placeholder="Ej: 1" required />
 
       <h3>Al completar este formulario, aceptás el descuento del total de las opciones seleccionadas por planilla de haberes, en cuatro cuotas.</h3>
 
@@ -189,7 +189,7 @@
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const params = new URLSearchParams(formData);
+      const params = new URLSearchParams(formData).toString();
 
       Swal.fire({
         title: "Enviando...",
@@ -198,8 +198,9 @@
         allowOutsideClick: false,
       });
 
-      const res = await fetch(SCRIPT_URL, { method: "POST", body: params });
+      const res = await fetch(`${SCRIPT_URL}?${params}`, { method: "POST" });
       const text = await res.text();
+
       Swal.close();
 
       if (text.includes("✅")) {
