@@ -160,7 +160,7 @@
       <div class="aviso-descuento">
         <h3>Importante</h3>
         <p>
-          Al enviar este formulario, confirmás que aceptás el descuento del <strong>total de las opciones seleccionadas</strong> directamente por <strong>planilla de haberes</strong>, dividido en <strong>4 cuotas iguales</strong>.
+          Al enviar este formulario, confirmás que aceptás el descuento del <strong>total de las opciones seleccionadas</strong> directamente por <strong>planilla de haberes</strong>, en <strong>4 cuotas iguales</strong>.
         </p>
         <p class="precio-opcion">
           El valor de <strong>cada opción</strong> es de <strong>$40.000</strong>.
@@ -213,7 +213,7 @@
       const formData = new FormData(e.target);
       const params = new URLSearchParams(formData).toString();
 
-      Swal.fire({ title: "Enviando...", text: "Registrando tu inscripción...", didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+      Swal.fire({ title: "Registrando...", text: "Esperá un momento...", didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
       const res = await fetch(`${SCRIPT_URL}?${params}`, { method: "POST" });
       const text = await res.text();
