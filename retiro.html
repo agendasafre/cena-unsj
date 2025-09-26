@@ -118,7 +118,6 @@
 
   <div id="info"></div>
 
-  <!-- 👇 Script idéntico al tuyo -->
   <script>
     const ENDPOINT_RETIRAR = "/api/retirar";
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
@@ -164,15 +163,6 @@
 
       return !invalido;
     }
-
-    // atamos eventos
-    ["input", "change"].forEach(evt => {
-      ["opciones", "celiacos", "vegetarianos", "veganos"].forEach(id => {
-        document.getElementById(id)?.addEventListener(evt, validarEspeciales);
-      });
-    });
-
-    validarEspeciales();
 
     const infoDiv = document.getElementById("info");
 
@@ -246,6 +236,16 @@
         <p><b>Retiró:</b> ${inv.retiro ? "✅ Sí" : "❌ No"}</p>
         <button type="button" onclick="marcarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
       `;
+
+      // 👉 Enganchamos los eventos recién después de renderizar el HTML
+      ["input", "change"].forEach(evt => {
+        ["opciones", "celiacos", "vegetarianos", "veganos"].forEach(id => {
+          document.getElementById(id)?.addEventListener(evt, validarEspeciales);
+        });
+      });
+
+      // 👉 Y validamos recién ahora
+      validarEspeciales();
     });
 
     async function marcarRetiro(dni) {
@@ -296,7 +296,6 @@
         }
       });
     }
-
   </script>
 </body>
 </html>
