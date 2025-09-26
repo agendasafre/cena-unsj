@@ -177,9 +177,9 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec";
-    const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
+    const SCRIPT_URL = proccess.env.SCRIPT_URL;
+    const SUPABASE_URL = proccess.env.SUPABASE_URL;
+    const SUPABASE_ANON_KEY = proccess.env.SUPABASE_ANON_KEY;
 
     const HEADERS = { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY };
 
