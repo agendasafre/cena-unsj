@@ -120,6 +120,7 @@
 
   <!-- 👇 Script idéntico al tuyo -->
   <script>
+    const ENDPOINT_RETIRAR = "/api/retirar";
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
     const HEADERS = {
@@ -197,7 +198,6 @@
     });
 
     async function marcarRetiro(dni) {
-
       if (!validarFechaLimite()) return;
 
       const opciones = document.getElementById("opciones").value;
@@ -212,7 +212,6 @@
       }).then(async (result) => {
         if (!result.isConfirmed) return;
 
-        // 🌀 Mostramos un loader mientras se procesa
         Swal.fire({
           title: "Confirmando retiro...",
           text: "Por favor esperá unos segundos ⏳",
@@ -222,16 +221,16 @@
         });
 
         try {
-          const resp = await fetch(
-            `https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec?action=retirar&dni=${dni}&opciones=${opciones}`,
-            { method: "POST" }
-          );
+          const resp = await fetch(ENDPOINT_RETIRAR, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dni, opciones })
+          });
 
           const text = await resp.text();
+          Swal.close();
 
-          Swal.close(); // cerramos el loader
-
-          if (text.includes("✅")) {
+          if (resp.ok && text.includes("✅")) {
             Swal.fire("✅ Retiro confirmado", "El retiro fue registrado correctamente.", "success");
           } else {
             Swal.fire("❌ Error", text, "error");

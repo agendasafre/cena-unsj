@@ -177,7 +177,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec";
+    const ENDPOINT_REGISTER = "/api/register";
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
 
@@ -203,9 +203,7 @@
     }
 
     dniInput.addEventListener("blur", async () => {
-      
       if (!validarFechaLimite()) return;
-      
       const dni = dniInput.value.trim();
       if (!dni) return;
 
@@ -226,7 +224,7 @@
             text: "Este DNI ya retiró su entrada. No es posible completar un nuevo registro.",
           });
           submitBtn.disabled = true;
-          submitBtn.textContent = "Enviar"; // volvemos al texto original por las dudas
+          submitBtn.textContent = "Enviar";
           return;
         }
 
@@ -246,7 +244,6 @@
           return;
         }
 
-        // 👇 Si no estaba inscripto y no retiró, es un registro nuevo
         Swal.fire({
           icon: "success",
           title: "✅ DNI validado",
@@ -255,7 +252,7 @@
           showConfirmButton: false
         });
         submitBtn.disabled = false;
-        submitBtn.textContent = "Enviar"; // vuelve al texto original
+        submitBtn.textContent = "Enviar";
         nombreInput.focus();
 
       } else {
@@ -265,22 +262,27 @@
           text: "Este DNI no está habilitado para registrarse.",
         });
         submitBtn.disabled = true;
-        submitBtn.textContent = "Enviar"; // aseguramos que no quede "Actualizar" de antes
+        submitBtn.textContent = "Enviar";
       }
     });
 
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const params = new URLSearchParams(formData).toString();
+      const payload = Object.fromEntries(formData.entries());
 
       Swal.fire({ title: "Registrando...", text: "Esperá un momento...", didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
-      const res = await fetch(`${SCRIPT_URL}?${params}`, { method: "POST" });
+      const res = await fetch(ENDPOINT_REGISTER, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
       const text = await res.text();
       Swal.close();
 
-      if (text.includes("✅")) {
+      if (res.ok && text.includes("✅")) {
         Swal.fire({ icon: "success", title: "Registro exitoso 🎉", text });
         e.target.reset();
         submitBtn.disabled = true;
@@ -291,5 +293,6 @@
 
     document.getElementById("anio").textContent = new Date().getFullYear();
   </script>
+
 </body>
 </html>
