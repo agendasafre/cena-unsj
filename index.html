@@ -157,6 +157,26 @@
       <label for="opciones">Cantidad de opciones</label>
       <input type="number" name="opciones" min="1" placeholder="Ej: 1" required />
 
+      <fieldset style="margin-top:16px; padding:12px; border:1px solid #e0e0e0; border-radius:8px;">
+        <legend style="padding:0 6px; color:#1d3557; font-weight:bold;">Menús especiales (opcional)</legend>
+
+        <label for="celiacos">Celíacos</label>
+        <input type="number" name="celiacos" id="celiacos" min="0" value="0" />
+
+        <label for="vegetarianos">Vegetarianos</label>
+        <input type="number" name="vegetarianos" id="vegetarianos" min="0" value="0" />
+
+        <label for="veganos">Veganos</label>
+        <input type="number" name="veganos" id="veganos" min="0" value="0" />
+
+        <p id="restoMsg" style="margin-top:8px; font-size:14px; color:#333;">
+          Te quedan <b id="restoNum">0</b> de <span id="opTotal">0</span> opciones para asignar a menús especiales.
+        </p>
+        <p id="errorMsg" style="display:none; color:#b00020; font-weight:bold; font-size:14px; margin-top:6px;">
+          La suma de menús especiales no puede superar la cantidad de opciones.
+        </p>
+      </fieldset>
+
       <div class="aviso-descuento">
         <h3>Importante</h3>
         <p>
@@ -187,6 +207,43 @@
     const nombreInput = document.getElementById("nombre");
     const submitBtn = document.getElementById("submitBtn");
     const fechaLimite = new Date("2025-11-28T23:59:59");
+    const opcionesInput = document.getElementById("opciones");
+    const celiacosInput = document.getElementById("celiacos");
+    const vegetarianosInput = document.getElementById("vegetarianos");
+    const veganosInput = document.getElementById("veganos");
+    const restoNum = document.getElementById("restoNum");
+    const opTotal = document.getElementById("opTotal");
+    const errorMsg = document.getElementById("errorMsg");
+
+    function int(v) {
+      const n = parseInt(v, 10);
+      return Number.isNaN(n) ? 0 : n;
+    }
+
+    function validarEspeciales() {
+      const total = int(opcionesInput?.value);
+      const a = int(celiacosInput?.value);
+      const b = int(vegetarianosInput?.value);
+      const c = int(veganosInput?.value);
+      const suma = a + b + c;
+
+      opTotal.textContent = total || 0;
+      const resto = Math.max(0, (total || 0) - suma);
+      restoNum.textContent = resto;
+
+      const invalido = suma > (total || 0);
+      errorMsg.style.display = invalido ? "block" : "none";
+      submitBtn.disabled = invalido || submitBtn.disabled; // si ya estaba disabled por DNI, se mantiene
+
+      return !invalido;
+    }
+
+    ["input", "change"].forEach(evt => {
+      opcionesInput?.addEventListener(evt, validarEspeciales);
+      celiacosInput?.addEventListener(evt, validarEspeciales);
+      vegetarianosInput?.addEventListener(evt, validarEspeciales);
+      veganosInput?.addEventListener(evt, validarEspeciales);
+    });
 
     function validarFechaLimite() {
       const ahora = new Date();
@@ -268,6 +325,13 @@
 
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      // validación extra en frontend
+      if (!validarEspeciales()) {
+        Swal.fire({ icon: "error", title: "Revisá los menús especiales", text: "La suma supera la cantidad de opciones." });
+        return;
+      }
+
       const formData = new FormData(e.target);
       const payload = Object.fromEntries(formData.entries());
 
@@ -292,6 +356,8 @@
     });
 
     document.getElementById("anio").textContent = new Date().getFullYear();
+      // Inicializamos los contadores
+    validarEspeciales();
   </script>
 
 </body>
