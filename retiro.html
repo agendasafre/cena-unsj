@@ -118,7 +118,6 @@
 
   <div id="info"></div>
 
-  <!-- 👇 Script idéntico al tuyo -->
   <script>
     const ENDPOINT_RETIRAR = "/api/retirar";
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
@@ -141,6 +140,28 @@
         return false;
       }
       return true;
+    }
+
+    function int(v) {
+      const n = parseInt(v, 10);
+      return Number.isNaN(n) ? 0 : n;
+    }
+
+    function validarEspeciales() {
+      const total = int(document.getElementById("opciones")?.value);
+      const a = int(document.getElementById("celiacos")?.value);
+      const b = int(document.getElementById("vegetarianos")?.value);
+      const c = int(document.getElementById("veganos")?.value);
+      const suma = a + b + c;
+
+      document.getElementById("opTotal").textContent = total || 0;
+      const resto = Math.max(0, (total || 0) - suma);
+      document.getElementById("restoNum").textContent = resto;
+
+      const invalido = suma > (total || 0);
+      document.getElementById("errorMsg").style.display = invalido ? "block" : "none";
+
+      return !invalido;
     }
 
     const infoDiv = document.getElementById("info");
@@ -191,16 +212,48 @@
         <p><b>Estado:</b> ${inv.estado}</p>
         <p><b>Opciones:</b> 
           <input type="number" id="opciones" value="${inv.opciones || 0}" min="0" />
+          <fieldset style="margin-top:12px; padding:8px; border:1px solid #ccc; border-radius:6px;">
+            <legend style="font-size:16px; font-weight:bold;">Menús especiales</legend>
+
+            <label for="celiacos">Celíacos:</label>
+            <input type="number" id="celiacos" min="0" value="${inv.opciones_celiacos ?? 0}" />
+
+            <label for="vegetarianos">Vegetarianos:</label>
+            <input type="number" id="vegetarianos" min="0" value="${inv.opciones_vegetarianos ?? 0}" />
+
+            <label for="veganos">Veganos:</label>
+            <input type="number" id="veganos" min="0" value="${inv.opciones_veganos ?? 0}" />
+
+            <p id="restoMsg" style="margin-top:6px; font-size:13px; color:#333;">
+              Te quedan <b id="restoNum">0</b> de <span id="opTotal">0</span> opciones para asignar a menús especiales.
+            </p>
+            <p id="errorMsg" style="display:none; color:#b00020; font-weight:bold; font-size:13px; margin-top:4px;">
+              La suma de menús especiales no puede superar la cantidad de opciones.
+            </p>
+          </fieldset>
         </p>
         <p><b>Retiró:</b> ${inv.retiro ? "✅ Sí" : "❌ No"}</p>
         <button type="button" onclick="marcarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
       `;
+
+      // 👉 Enganchamos los eventos recién después de renderizar el HTML
+      ["input", "change"].forEach(evt => {
+        ["opciones", "celiacos", "vegetarianos", "veganos"].forEach(id => {
+          document.getElementById(id)?.addEventListener(evt, validarEspeciales);
+        });
+      });
+
+      // 👉 Y validamos recién ahora
+      validarEspeciales();
     });
 
     async function marcarRetiro(dni) {
       if (!validarFechaLimite()) return;
 
       const opciones = document.getElementById("opciones").value;
+      const celiacos = document.getElementById("celiacos").value;
+      const vegetarianos = document.getElementById("vegetarianos").value;
+      const veganos = document.getElementById("veganos").value;
 
       Swal.fire({
         title: "Confirmar retiro",
@@ -224,7 +277,7 @@
           const resp = await fetch(ENDPOINT_RETIRAR, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ dni, opciones })
+            body: JSON.stringify({ dni, opciones, celiacos, vegetarianos, veganos })
           });
 
           const text = await resp.text();
@@ -242,7 +295,6 @@
         }
       });
     }
-
   </script>
 </body>
 </html>

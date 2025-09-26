@@ -3,8 +3,8 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).send("Método no permitido");
   }
-  console.log('aqui');
-  const { dni, opciones } = req.body;
+  
+  const { dni, opciones, celiacos = 0, vegetarianos = 0, veganos = 0 } = req.body;
 
   if (!dni) {
     return res.status(400).send("❌ Falta el DNI.");
@@ -21,7 +21,10 @@ export default async function handler(req, res) {
     const query = new URLSearchParams({
       action: "retirar",
       dni,
-      opciones: opciones || 0
+      opciones: opciones || 0,
+      celiacos: celiacos || 0,
+      vegetarianos: vegetarianos || 0,
+      veganos: veganos || 0
     }).toString();
 
     const response = await fetch(`${scriptUrl}?${query}`, { method: "POST" });

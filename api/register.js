@@ -3,10 +3,33 @@ export default async function handler(req, res) {
     return res.status(405).send("Método no permitido");
   }
 
-  const { dni, nombre, correo, lugar, opciones } = req.body;
+  const {
+    dni,
+    nombre,
+    correo,
+    lugar,
+    opciones,
+    celiacos = 0,
+    vegetarianos = 0,
+    veganos = 0,
+  } = req.body;
 
   if (!dni || !nombre || !correo || !lugar) {
     return res.status(400).send("❌ Faltan datos obligatorios.");
+  }
+
+  const numOpciones = parseInt(opciones ?? 0, 10) || 0;
+  const numCeliacos = parseInt(celiacos ?? 0, 10) || 0;
+  const numVegetarianos = parseInt(vegetarianos ?? 0, 10) || 0;
+  const numVeganos = parseInt(veganos ?? 0, 10) || 0;
+
+  if (numCeliacos < 0 || numVegetarianos < 0 || numVeganos < 0) {
+    return res.status(400).send("❌ Los menús especiales no pueden ser negativos.");
+  }
+
+  const sumaEspeciales = numCeliacos + numVegetarianos + numVeganos;
+  if (sumaEspeciales > numOpciones) {
+    return res.status(400).send("❌ La suma de menús especiales no puede superar la cantidad de opciones.");
   }
 
   // 📅 Fecha límite
@@ -18,7 +41,16 @@ export default async function handler(req, res) {
   try {
     // 🔐 Reenviamos el formulario al Apps Script (oculto con ENV)
     const scriptUrl = process.env.SCRIPT_URL;
-    const query = new URLSearchParams({ dni, nombre, correo, lugar, opciones }).toString();
+    const query = new URLSearchParams({
+      dni,
+      nombre,
+      correo,
+      lugar,
+      opciones: String(numOpciones),
+      celiacos: String(numCeliacos),
+      vegetarianos: String(numVegetarianos),
+      veganos: String(numVeganos),
+    }).toString();
 
     const response = await fetch(`${scriptUrl}?${query}`, { method: "POST" });
     const text = await response.text();
