@@ -233,16 +233,21 @@
 
       const invalido = suma > (total || 0);
       errorMsg.style.display = invalido ? "block" : "none";
-      submitBtn.disabled = invalido || submitBtn.disabled; // si ya estaba disabled por DNI, se mantiene
+      submitBtn.disabled = invalido
 
       return !invalido;
     }
 
-    ["input", "change"].forEach(evt => {
-      opcionesInput?.addEventListener(evt, validarEspeciales);
-      celiacosInput?.addEventListener(evt, validarEspeciales);
-      vegetarianosInput?.addEventListener(evt, validarEspeciales);
-      veganosInput?.addEventListener(evt, validarEspeciales);
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      ["input", "change"].forEach(evt => {
+        opcionesInput?.addEventListener(evt, validarEspeciales);
+        celiacosInput?.addEventListener(evt, validarEspeciales);
+        vegetarianosInput?.addEventListener(evt, validarEspeciales);
+        veganosInput?.addEventListener(evt, validarEspeciales);
+      });
+
+      validarEspeciales();
     });
 
     function validarFechaLimite() {
@@ -356,8 +361,6 @@
     });
 
     document.getElementById("anio").textContent = new Date().getFullYear();
-      // Inicializamos los contadores
-    validarEspeciales();
   </script>
 
 </body>
