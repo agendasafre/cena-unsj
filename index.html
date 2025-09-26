@@ -215,6 +215,8 @@
     const opTotal = document.getElementById("opTotal");
     const errorMsg = document.getElementById("errorMsg");
 
+    let dniValido = false;
+
     function int(v) {
       const n = parseInt(v, 10);
       return Number.isNaN(n) ? 0 : n;
@@ -233,7 +235,7 @@
 
       const invalido = suma > (total || 0);
       errorMsg.style.display = invalido ? "block" : "none";
-      submitBtn.disabled = invalido
+      submitBtn.disabled = !(dniValido && !invalido);
 
       return !invalido;
     }
@@ -285,6 +287,7 @@
             title: "⚠️ Retiro ya registrado",
             text: "Este DNI ya retiró su entrada. No es posible completar un nuevo registro.",
           });
+          dniValido = false;
           submitBtn.disabled = true;
           submitBtn.textContent = "Enviar";
           return;
@@ -300,9 +303,11 @@
             `,
             confirmButtonText: "Entendido",
           });
+          dniValido = true;
           submitBtn.disabled = false;
           submitBtn.textContent = "Actualizar registro ✏️";
           nombreInput.focus();
+          validarEspeciales();
           return;
         }
 
@@ -313,10 +318,11 @@
           timer: 1800,
           showConfirmButton: false
         });
+        dniValido = true;
         submitBtn.disabled = false;
         submitBtn.textContent = "Enviar";
         nombreInput.focus();
-
+        validarEspeciales();
       } else {
         Swal.fire({
           icon: "error",
