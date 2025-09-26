@@ -212,9 +212,8 @@
         <p><b>Estado:</b> ${inv.estado}</p>
         <p><b>Opciones:</b> 
           <input type="number" id="opciones" value="${inv.opciones || 0}" min="0" />
-          <p><b>Menús especiales:</b></p>
           <fieldset style="margin-top:12px; padding:8px; border:1px solid #ccc; border-radius:6px;">
-            <legend style="font-size:14px; font-weight:bold;">Menús especiales</legend>
+            <legend style="font-size:16px; font-weight:bold;">Menús especiales</legend>
 
             <label for="celiacos">Celíacos:</label>
             <input type="number" id="celiacos" min="0" value="${inv.opciones_celiacos ?? 0}" />
