@@ -120,84 +120,9 @@
 
   <!-- 👇 Script idéntico al tuyo -->
   <script>
-    const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
-    const HEADERS = {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: "Bearer " + SUPABASE_ANON_KEY,
-    };
-    const fechaLimite = new Date("2025-11-28T23:59:59");
-
-    function validarFechaLimite() {
-      const ahora = new Date();
-      if (ahora > fechaLimite) {
-        Swal.fire({
-          icon: "warning",
-          title: "⏰ Plazo finalizado",
-          text: "El período para registrarse o retirar entradas ha finalizado (28/11/2025).",
-          confirmButtonText: "Entendido"
-        });
-        return false;
-      }
-      return true;
-    }
-
-    const infoDiv = document.getElementById("info");
-
-    document.getElementById("buscarForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      if (!validarFechaLimite()) return;
-
-      const dni = e.target.dni.value.trim();
-      if (!dni) return;
-
-      Swal.fire({
-        title: "Buscando inscripto...",
-        text: "Por favor esperá un momento ⏳",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/invitados?dni=eq.${dni}`, { headers: HEADERS });
-      const data = await res.json();
-
-      Swal.close();
-
-      if (!data.length) {
-        Swal.fire("❌ No encontrado", "No existe un registro con ese DNI.", "error");
-        infoDiv.style.display = "none";
-        return;
-      }
-
-      const inv = data[0];
-
-      if (inv.estado === "pendiente") {
-        Swal.fire(
-          "⚠️ Inscripción pendiente",
-          `${inv.nombre || "Este usuario"} aún no completó la inscripción. No se puede registrar el retiro.`,
-          "warning"
-        );
-        infoDiv.style.display = "none";
-        return;
-      }
-
-      infoDiv.style.display = "block";
-      infoDiv.innerHTML = `
-        <p><b>Nombre:</b> ${inv.nombre}</p>
-        <p><b>Correo:</b> ${inv.correo}</p>
-        <p><b>Lugar:</b> ${inv.lugar_trabajo}</p>
-        <p><b>Estado:</b> ${inv.estado}</p>
-        <p><b>Opciones:</b> 
-          <input type="number" id="opciones" value="${inv.opciones || 0}" min="0" />
-        </p>
-        <p><b>Retiró:</b> ${inv.retiro ? "✅ Sí" : "❌ No"}</p>
-        <button type="button" onclick="marcarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
-      `;
-    });
+    const ENDPOINT_RETIRAR = "/api/retirar";
 
     async function marcarRetiro(dni) {
-
       if (!validarFechaLimite()) return;
 
       const opciones = document.getElementById("opciones").value;
@@ -212,7 +137,6 @@
       }).then(async (result) => {
         if (!result.isConfirmed) return;
 
-        // 🌀 Mostramos un loader mientras se procesa
         Swal.fire({
           title: "Confirmando retiro...",
           text: "Por favor esperá unos segundos ⏳",
@@ -222,16 +146,16 @@
         });
 
         try {
-          const resp = await fetch(
-            `https://script.google.com/macros/s/AKfycbzWdc0c-wkCTneuBZN620rG8pA-BRzCwJ2WTPRvbTeWqsUbJc_qIcvShkzePnZkaZ4V/exec?action=retirar&dni=${dni}&opciones=${opciones}`,
-            { method: "POST" }
-          );
+          const resp = await fetch(ENDPOINT_RETIRAR, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dni, opciones })
+          });
 
           const text = await resp.text();
+          Swal.close();
 
-          Swal.close(); // cerramos el loader
-
-          if (text.includes("✅")) {
+          if (resp.ok && text.includes("✅")) {
             Swal.fire("✅ Retiro confirmado", "El retiro fue registrado correctamente.", "success");
           } else {
             Swal.fire("❌ Error", text, "error");
@@ -243,6 +167,7 @@
         }
       });
     }
+
 
   </script>
 </body>
