@@ -3,7 +3,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).send("Método no permitido");
   }
-
+  console.log('aqui');
   const { dni, opciones } = req.body;
 
   if (!dni) {
