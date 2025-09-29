@@ -43,13 +43,13 @@
 // api/retirar.js
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).send("Método no permitido");
   }
-
+  
   const { dni, opciones, celiacos = 0, vegetarianos = 0, veganos = 0 } = req.body;
   if (!dni) return res.status(400).send("❌ Falta el DNI.");
 
