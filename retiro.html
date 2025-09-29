@@ -5,31 +5,6 @@
   <title>🎟️ Retiro de Entradas – Cena de Fin de Año</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-    const supabase = createClient("https://dlitmctfjzmedssrbazs.supabase.co", "TU_ANON_KEY");
-
-    async function asignarNumeros(dni, cantidad) {
-      const { data, error } = await supabase
-        .from("entradas")
-        .select("numero")
-        .eq("entregado", false)
-        .order("random()")
-        .limit(cantidad);
-      if (error) throw error;
-
-      const numeros = data.map(d => d.numero);
-      const { error: updError } = await supabase
-        .from("entradas")
-        .update({ entregado: true, dni_titular: dni })
-        .in("numero", numeros);
-      if (updError) throw updError;
-
-      return numeros;
-    }
-
-    window.asignarNumeros = asignarNumeros; // para usarlo desde marcarRetiro
-  </script>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -287,6 +262,9 @@
         confirmButtonText: "Sí, confirmar ✅",
         cancelButtonText: "Cancelar"
       }).then(async (result) => {
+
+        asignarNumeros(dni, opciones);
+
         if (!result.isConfirmed) return;
 
         Swal.fire({
@@ -322,6 +300,27 @@
         }
       });
     }
+
+    async function asignarNumeros(dni, cantidad) {
+      const { data, error } = await supabase
+        .from("entradas")
+        .select("numero")
+        .eq("entregado", false)
+        .order("random()")
+        .limit(cantidad);
+      if (error) throw error;
+
+      const numeros = data.map(d => d.numero);
+      const { error: updError } = await supabase
+        .from("entradas")
+        .update({ entregado: true, dni_titular: dni })
+        .in("numero", numeros);
+      if (updError) throw updError;
+
+      return numeros;
+    }
+
+    // window.asignarNumeros = asignarNumeros; // para usarlo desde marcarRetiro
   </script>
 </body>
 </html>
