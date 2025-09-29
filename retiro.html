@@ -120,7 +120,8 @@
   <script>
     const ENDPOINT_RETIRAR = "/api/retirar";
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
+    const SUPABASE_ANON_KEY = "TU_ANON_KEY"; // ⚠️ usar ANON, nunca SERVICE_ROLE
+
     const HEADERS = {
       apikey: SUPABASE_ANON_KEY,
       Authorization: "Bearer " + SUPABASE_ANON_KEY,
@@ -235,36 +236,31 @@
         <button type="button" onclick="marcarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
       `;
 
-      // 👉 Enganchamos los eventos recién después de renderizar el HTML
       ["input", "change"].forEach(evt => {
         ["opciones", "celiacos", "vegetarianos", "veganos"].forEach(id => {
           document.getElementById(id)?.addEventListener(evt, validarEspeciales);
         });
       });
 
-      // 👉 Y validamos recién ahora
       validarEspeciales();
     });
 
     async function marcarRetiro(dni) {
       if (!validarFechaLimite()) return;
 
-      const opciones = document.getElementById("opciones").value;
+      const opciones = parseInt(document.getElementById("opciones").value, 10);
       const celiacos = document.getElementById("celiacos").value;
       const vegetarianos = document.getElementById("vegetarianos").value;
       const veganos = document.getElementById("veganos").value;
 
       Swal.fire({
         title: "Confirmar retiro",
-        text: "¿Querés marcar este retiro como completado?",
+        text: `Se van a entregar ${opciones} pulsera(s). ¿Querés continuar?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Sí, confirmar ✅",
         cancelButtonText: "Cancelar"
       }).then(async (result) => {
-
-        asignarNumeros(dni, opciones);
-
         if (!result.isConfirmed) return;
 
         Swal.fire({
@@ -276,6 +272,7 @@
         });
 
         try {
+          // 1) Backend (Apps Script + mail)
           const resp = await fetch(ENDPOINT_RETIRAR, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -283,16 +280,21 @@
           });
 
           const text = await resp.text();
-          const numeros = await asignarNumeros(dni, opciones);
-          Swal.close();
-
-          if (resp.ok && text.includes("✅")) {
-            Swal.fire("✅ Retiro confirmado",
-              `Números de pulsera entregados: ${numeros.join(", ")}`,
-              "success");
-          } else {
+          if (!resp.ok || !text.includes("✅")) {
+            Swal.close();
             Swal.fire("❌ Error", text, "error");
+            return;
           }
+
+          // 2) Asignar números en Supabase
+          const numeros = await asignarNumeros(dni, opciones);
+
+          Swal.close();
+          Swal.fire("✅ Retiro confirmado",
+            `Números de pulsera entregados: <b>${numeros.join(", ")}</b>`,
+            "success"
+          );
+
         } catch (err) {
           Swal.close();
           Swal.fire("❌ Error", "Ocurrió un error al procesar la solicitud.", "error");
@@ -308,19 +310,21 @@
         .eq("entregado", false)
         .order("random()")
         .limit(cantidad);
+
       if (error) throw error;
 
       const numeros = data.map(d => d.numero);
+
       const { error: updError } = await supabase
         .from("entradas")
         .update({ entregado: true, dni_titular: dni })
         .in("numero", numeros);
+
       if (updError) throw updError;
 
       return numeros;
     }
-
-    // window.asignarNumeros = asignarNumeros; // para usarlo desde marcarRetiro
   </script>
+
 </body>
 </html>
