@@ -247,27 +247,26 @@
       return t * (2 - t);
     }
 
-    function setSlotDisplay(persona) {
-      slotText.textContent = `${persona.nombre} — ${persona.lugar_trabajo || "—"}`;
+    function setSlotDisplay(entrada) {
+      slotText.textContent = `Nº ${entrada.numero}`;
     }
 
     async function fetchElegibles() {
       const { data, error } = await supabase
-        .from("invitados")
-        .select("id, nombre, lugar_trabajo")
-        .eq("retiro", true)
-        .eq("estado", "inscripto")
+        .from("entradas")
+        .select("id, numero")
+        .eq("entregado", true)
         .eq("sorteado", false);
 
       if (error) throw error;
       return data || [];
     }
 
-    function showWinner(persona) {
-      winnerName.textContent = persona.nombre;
-      winnerPlace.textContent = persona.lugar_trabajo || "—";
+    function showWinner(entrada) {
+      winnerName.textContent = `Nº ${entrada.numero}`;
+      winnerPlace.textContent = ""; // podés dejar vacío u ocultar el div en HTML
       winnerEl.classList.add("show");
-      fireConfetti(); // 🎉 sutil
+      fireConfetti();
     }
 
     function hideWinner() {
@@ -296,7 +295,7 @@
 
     async function marcarSorteado(id) {
       const { error } = await supabase
-        .from("invitados")
+        .from("entradas")
         .update({ sorteado: true })
         .eq("id", id);
       if (error) {
