@@ -245,7 +245,7 @@
       validarEspeciales();
     });
 
-    async function marcarRetiro(dni) {
+   async function marcarRetiro(dni) {
       if (!validarFechaLimite()) return;
 
       const opciones = parseInt(document.getElementById("opciones").value, 10);
@@ -272,7 +272,6 @@
         });
 
         try {
-          // 1) Backend (Apps Script + mail)
           const resp = await fetch(ENDPOINT_RETIRAR, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -280,21 +279,13 @@
           });
 
           const text = await resp.text();
-          if (!resp.ok || !text.includes("✅")) {
-            Swal.close();
-            Swal.fire("❌ Error", text, "error");
-            return;
-          }
-
-          // 2) Asignar números en Supabase
-          const numeros = await asignarNumeros(dni, opciones);
-
           Swal.close();
-          Swal.fire("✅ Retiro confirmado",
-            `Números de pulsera entregados: <b>${numeros.join(", ")}</b>`,
-            "success"
-          );
 
+          if (resp.ok && text.includes("✅")) {
+            Swal.fire("✅ Retiro confirmado", text, "success");
+          } else {
+            Swal.fire("❌ Error", text, "error");
+          }
         } catch (err) {
           Swal.close();
           Swal.fire("❌ Error", "Ocurrió un error al procesar la solicitud.", "error");
@@ -302,7 +293,7 @@
         }
       });
     }
-
+    
     async function asignarNumeros(dni, cantidad) {
       const { data, error } = await supabase
         .from("entradas")
