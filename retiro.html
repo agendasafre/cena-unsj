@@ -6,16 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden; /* 🔒 evita scroll vertical */
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #1d3557, #457b9d);
       color: #fff;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 20px;
+      height: 100vh;     /* en lugar de min-height */
+      box-sizing: border-box;
     }
 
     h2 {
