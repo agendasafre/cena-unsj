@@ -173,16 +173,19 @@
       running = true; btnStart.disabled = true; hideWinner();
 
       // llamamos a la función sortear_asistente
-      const { data: ganador, error } = await supabase.rpc("sortear_asistente");
+      const { data, error } = await supabase.rpc("sortear_asistente");
 
       if (error) {
         running = false; btnStart.disabled = false;
         return Swal.fire("⚠️ Error","No se pudo realizar el sorteo.","warning");
       }
-      if (!ganador) {
+
+      if (!data || data.length === 0) {
         running = false; btnStart.disabled = false;
         return Swal.fire("Sin elegibles","No quedan números disponibles.","info");
       }
+
+      const ganador = data[0]; // 👈 ahora siempre array
 
       // animación visual de la ruleta antes de mostrar el ganador
       const start = performance.now();
@@ -206,6 +209,7 @@
       btnNext.disabled = false;
       running = false;
     }
+
 
     async function nextRound() {
       btnNext.disabled = true;
