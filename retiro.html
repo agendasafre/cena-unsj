@@ -5,18 +5,34 @@
   <title>🎟️ Retiro de Entradas – Cena de Fin de Año</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
   <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #1d3557, #457b9d);
       color: #fff;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Estado inicial: sin scroll, ocupa toda la pantalla */
+    body.initial {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Cuando aparece info: permitimos scroll si se necesita */
+    body.with-info {
+      min-height: 100vh;
+      overflow-y: auto;
     }
 
     h2 {
@@ -52,7 +68,7 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      box-sizing: border-box; /* 📏 evita que se salga del contenedor */
+      box-sizing: border-box;
     }
 
     input:focus {
@@ -62,7 +78,7 @@
     }
 
     button {
-      background: none; /* 🎨 Azul petróleo en lugar de rojo */
+      background: none;
       border: none;
       color: white;
       font-size: 18px;
@@ -71,7 +87,6 @@
     }
 
     button:hover {
-      background: none;
       transform: scale(1.03);
     }
 
@@ -105,9 +120,10 @@
     #info button:hover {
       background: #274a78;
     }
+
   </style>
 </head>
-<body>
+<body class="initial">
   <h2>🎟️ Retiro de Entradas</h2>
 
   <form id="buscarForm">
@@ -122,6 +138,7 @@
     const ENDPOINT_RETIRAR = "/api/retirar";
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
+
     const HEADERS = {
       apikey: SUPABASE_ANON_KEY,
       Authorization: "Bearer " + SUPABASE_ANON_KEY,
@@ -189,6 +206,8 @@
       if (!data.length) {
         Swal.fire("❌ No encontrado", "No existe un registro con ese DNI.", "error");
         infoDiv.style.display = "none";
+        document.body.classList.remove("with-info");
+        document.body.classList.add("initial");
         return;
       }
 
@@ -201,10 +220,14 @@
           "warning"
         );
         infoDiv.style.display = "none";
+        document.body.classList.remove("with-info");
+        document.body.classList.add("initial");
         return;
       }
 
       infoDiv.style.display = "block";
+      document.body.classList.remove("initial");
+      document.body.classList.add("with-info");
       infoDiv.innerHTML = `
         <p><b>Nombre:</b> ${inv.nombre}</p>
         <p><b>Correo:</b> ${inv.correo}</p>
@@ -236,28 +259,26 @@
         <button type="button" onclick="marcarRetiro('${inv.dni}')">✅ Confirmar retiro</button>
       `;
 
-      // 👉 Enganchamos los eventos recién después de renderizar el HTML
       ["input", "change"].forEach(evt => {
         ["opciones", "celiacos", "vegetarianos", "veganos"].forEach(id => {
           document.getElementById(id)?.addEventListener(evt, validarEspeciales);
         });
       });
 
-      // 👉 Y validamos recién ahora
       validarEspeciales();
     });
 
-    async function marcarRetiro(dni) {
+   async function marcarRetiro(dni) {
       if (!validarFechaLimite()) return;
 
-      const opciones = document.getElementById("opciones").value;
+      const opciones = parseInt(document.getElementById("opciones").value, 10);
       const celiacos = document.getElementById("celiacos").value;
       const vegetarianos = document.getElementById("vegetarianos").value;
       const veganos = document.getElementById("veganos").value;
 
       Swal.fire({
         title: "Confirmar retiro",
-        text: "¿Querés marcar este retiro como completado?",
+        text: `Se van a entregar ${opciones} pulsera(s). ¿Querés continuar?`,
         icon: "question",
         showCancelButton: true,
         confirmButtonText: "Sí, confirmar ✅",
@@ -284,7 +305,7 @@
           Swal.close();
 
           if (resp.ok && text.includes("✅")) {
-            Swal.fire("✅ Retiro confirmado", "El retiro fue registrado correctamente.", "success");
+            Swal.fire("✅ Retiro confirmado", text, "success");
           } else {
             Swal.fire("❌ Error", text, "error");
           }
@@ -295,6 +316,29 @@
         }
       });
     }
+    
+    async function asignarNumeros(dni, cantidad) {
+      const { data, error } = await supabase
+        .from("entradas")
+        .select("numero")
+        .eq("entregado", false)
+        .order("random()")
+        .limit(cantidad);
+
+      if (error) throw error;
+
+      const numeros = data.map(d => d.numero);
+
+      const { error: updError } = await supabase
+        .from("entradas")
+        .update({ entregado: true, dni_titular: dni })
+        .in("numero", numeros);
+
+      if (updError) throw updError;
+
+      return numeros;
+    }
   </script>
+
 </body>
 </html>

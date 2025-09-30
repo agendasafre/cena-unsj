@@ -1,9 +1,9 @@
-// api/retirar.js
+// // api/retirar.js
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).send("Método no permitido");
   }
-  
+
   const { dni, opciones, celiacos = 0, vegetarianos = 0, veganos = 0 } = req.body;
 
   if (!dni) {
@@ -30,11 +30,7 @@ export default async function handler(req, res) {
     const response = await fetch(`${scriptUrl}?${query}`, { method: "POST" });
     const text = await response.text();
 
-    if (!response.ok || !text.includes("✅")) {
-      return res.status(500).send("❌ Error al registrar el retiro.");
-    }
-
-    return res.status(200).send(text);
+    return res.status(response.ok ? 200 : 500).send(text);
   } catch (err) {
     console.error("❌ Error al reenviar al script:", err);
     return res.status(500).send("❌ No se pudo completar el retiro.");

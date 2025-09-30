@@ -4,64 +4,37 @@
   <meta charset="UTF-8" />
   <title>Sorteo – Cena de Fin de Año</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <!-- SweetAlert2 para mensajes -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
   <style>
-    :root{
-      /* 🎨 Colores del gradiente (cambiables sin tocar más nada) */
-      --g1: #0d47a1; /* azul profundo */
-      --g2: #1976d2; /* azul medio */
-      --g3: #ffffff; /* blanco */
+    :root {
+      --g1: #0d47a1;
+      --g2: #1976d2;
+      --g3: #ffffff;
     }
-
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-
+    html, body { height: 100%; margin: 0; }
     body {
       font-family: "Segoe UI", Arial, sans-serif;
       color: #fff;
-      overflow: hidden; /* pantalla limpia para proyector */
+      overflow: hidden;
       background: linear-gradient(130deg, var(--g1), var(--g2), var(--g3));
       background-size: 200% 200%;
       animation: bgMove 14s ease-in-out infinite;
     }
-
     @keyframes bgMove {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
     .wrap {
       position: relative;
-      height: 100%;
-      width: 100%;
+      height: 100%; width: 100%;
       display: grid;
       grid-template-rows: auto 1fr auto;
-      align-items: center;
-      justify-items: center;
-      padding: 24px;
-      box-sizing: border-box;
+      align-items: center; justify-items: center;
+      padding: 24px; box-sizing: border-box;
     }
-
-    .logo {
-      width: clamp(100px, 12vw, 160px);
-      height: auto;
-      filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
-      margin-top: 4px;
-    }
-
-    .title {
-      margin: 10px 0 0;
-      font-weight: 600;
-      letter-spacing: .4px;
-      text-shadow: 0 2px 10px rgba(0,0,0,.25);
-      opacity: .95;
-    }
-
+    .logo { width: clamp(100px, 12vw, 160px); height: auto; margin-top: 4px; }
+    .title { margin: 10px 0 0; font-weight: 600; }
     .slot {
       position: relative;
       width: min(900px, 92vw);
@@ -70,111 +43,49 @@
       border-radius: 14px;
       background: rgba(255,255,255,.12);
       backdrop-filter: blur(6px);
-      box-shadow: 0 10px 25px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.2);
-      display: grid;
-      place-items: center;
-      overflow: hidden;
+      display: grid; place-items: center;
     }
-
     .slot__text {
       font-size: clamp(24px, 4vw, 44px);
       font-weight: 700;
-      text-align: center;
-      padding: 0 18px;
-      line-height: 1.2;
       text-shadow: 0 4px 12px rgba(0,0,0,.35);
-      white-space: nowrap;
     }
-
-    .controls {
-      margin-top: clamp(18px, 3vh, 26px);
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
+    .controls { margin-top: 20px; display: flex; gap: 14px; }
     .btn {
-      font-size: clamp(16px, 2.2vw, 20px);
-      padding: 12px 22px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      color: #0d2b57;
-      background: #fff; /* celeste suave */
-      box-shadow: 0 6px 18px rgba(0,0,0,.25);
-      transition: transform .08s ease, box-shadow .2s ease, filter .2s ease, background .3s ease;
+      font-size: 18px; padding: 12px 22px;
+      border-radius: 12px; border: none;
+      cursor: pointer; color: #0d2b57;
+      background: #fff;
     }
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.28); }
-    .btn:active { transform: translateY(0); box-shadow: 0 6px 18px rgba(0,0,0,.25); }
-    .btn[disabled] { opacity: .6; cursor: not-allowed; filter: grayscale(.2); }
-
-    .footer {
-      margin-top: 14px;
-      font-size: clamp(12px, 1.6vw, 14px);
-      opacity: .85;
-      text-shadow: 0 2px 8px rgba(0,0,0,.25);
-    }
-
-    /* 🏆 Overlay de ganador */
     .winner {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: radial-gradient(1200px 600px at 50% -10%, rgba(255,255,255,.15), rgba(0,0,0,.55));
-      display: none;
-      place-items: center;
+      display: none; place-items: center;
       z-index: 10;
-      backdrop-filter: blur(2px);
     }
     .winner.show { display: grid; }
-
     .winner__card {
       text-align: center;
-      max-width: min(1200px, 90vw);
-      padding: clamp(18px, 4vw, 34px);
+      padding: 20px;
       border-radius: 18px;
       background: rgba(255,255,255,.1);
-      box-shadow: 0 20px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.25);
-      animation: popIn .6s cubic-bezier(.17,.67,.2,1.2);
-    }
-    @keyframes popIn {
-      from { transform: scale(.92); opacity: 0; }
-      to   { transform: scale(1);    opacity: 1; }
-    }
-
-    .winner__pre {
-      font-size: clamp(22px, 3.2vw, 36px);
-      margin: 0 0 8px;
-      opacity: .95;
-      text-shadow: 0 2px 10px rgba(0,0,0,.3);
     }
     .winner__name {
       font-size: clamp(40px, 7vw, 92px);
       font-weight: 800;
-      margin: 6px 0 0;
-      line-height: 1.05;
-      letter-spacing: .4px;
-      text-shadow: 0 8px 28px rgba(0,0,0,.35);
+      margin-top: 10px;
     }
-    .winner__place {
-      font-size: clamp(18px, 2.6vw, 28px);
-      margin: 14px 0 0;
-      opacity: .95;
-      text-shadow: 0 4px 14px rgba(0,0,0,.3);
+    .winner__card .controls {
+      justify-content: center; /* botón centrado */
     }
-
-    /* ✨ Confetti sutil (CSS-only dots) */
-    .confetti {
-      position: fixed; inset: 0; pointer-events: none; overflow: hidden;
-    }
+    .confetti { position: fixed; inset: 0; pointer-events: none; }
     .dot {
       position: absolute; width: 8px; height: 8px; border-radius: 50%;
-      opacity: .85; filter: drop-shadow(0 2px 2px rgba(0,0,0,.25));
       animation: fall linear forwards;
     }
     @keyframes fall {
-      from { transform: translateY(-10vh) rotate(0deg); }
-      to   { transform: translateY(110vh) rotate(480deg); }
+      from { transform: translateY(-10vh); }
+      to { transform: translateY(110vh); }
     }
   </style>
 </head>
@@ -185,89 +96,57 @@
       <h1 class="title">Sorteo – Cena de Fin de Año - UNSJ 2025</h1>
     </div>
 
-    <!-- 🎰 Slot visual -->
     <div class="slot">
       <div id="slotText" class="slot__text">Listo para sortear…</div>
     </div>
 
-    <!-- 🎛️ Controles -->
     <div class="controls">
       <button id="btnStart" class="btn">🎲 Iniciar sorteo</button>
     </div>
   </div>
 
-  <!-- 🏆 Overlay de ganador -->
   <div id="winner" class="winner">
     <div class="winner__card">
-      <div class="winner__pre">👏 Aplausos para…</div>
-      <div id="winnerName" class="winner__name">Nombre Apellido</div>
-      <div id="winnerPlace" class="winner__place">Lugar de trabajo</div>
+      <div class="winner__name" id="winnerName">Nº 000</div>
       <div class="controls" style="margin-top:22px;">
         <button id="btnNext" class="btn">🎲 Sortear siguiente</button>
       </div>
     </div>
-    <div id="confetti" class="confetti" aria-hidden="true"></div>
+    <div id="confetti" class="confetti"></div>
   </div>
 
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    /* 🔌 Conexión Supabase */
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    /* ⏱️ Config animación */
-    const DURATION_MS = 4500;   // 4.5s como pediste
-    const TICK_MIN_MS = 45;     // mínimo entre cambios de nombre al final
-    const TICK_MAX_MS = 120;    // máximo al inicio (más rápido = menor valor)
+    const DURATION_MS = 4500;
+    const TICK_MIN_MS = 45;
+    const TICK_MAX_MS = 120;
 
-    /* 🔤 UI refs */
     const slotText   = document.getElementById("slotText");
     const btnStart   = document.getElementById("btnStart");
     const winnerEl   = document.getElementById("winner");
     const winnerName = document.getElementById("winnerName");
-    const winnerPlace= document.getElementById("winnerPlace");
     const btnNext    = document.getElementById("btnNext");
     const confettiEl = document.getElementById("confetti");
 
     let running = false;
-
     const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+    const easeOutQuad = (t) => t * (2 - t);
 
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
+    function setSlotDisplay(entrada) {
+      slotText.textContent = `Nº ${entrada.numero}`;
     }
 
-    function easeOutQuad(t) {
-      return t * (2 - t);
-    }
-
-    function setSlotDisplay(persona) {
-      slotText.textContent = `${persona.nombre} — ${persona.lugar_trabajo || "—"}`;
-    }
-
-    async function fetchElegibles() {
-      const { data, error } = await supabase
-        .from("invitados")
-        .select("id, nombre, lugar_trabajo")
-        .eq("retiro", true)
-        .eq("estado", "inscripto")
-        .eq("sorteado", false);
-
-      if (error) throw error;
-      return data || [];
-    }
-
-    function showWinner(persona) {
-      winnerName.textContent = persona.nombre;
-      winnerPlace.textContent = persona.lugar_trabajo || "—";
+    function showWinner(entrada) {
+      winnerName.textContent = `Nº ${entrada.numero}`;
       winnerEl.classList.add("show");
-      fireConfetti(); // 🎉 sutil
+      fireConfetti();
     }
 
     function hideWinner() {
@@ -277,106 +156,69 @@
 
     function fireConfetti() {
       clearConfetti();
-      const colors = ["#fff176", "#a5d6a7", "#81d4fa", "#f48fb1", "#ffd54f", "#b39ddb"];
-      const total = 80;
-      for (let i = 0; i < total; i++) {
+      const colors = ["#fff176","#a5d6a7","#81d4fa","#f48fb1","#ffd54f","#b39ddb"];
+      for (let i = 0; i < 80; i++) {
         const d = document.createElement("div");
         d.className = "dot";
         d.style.left = Math.random()*100 + "vw";
-        d.style.top  = (-10 - Math.random()*30) + "vh";
         d.style.background = colors[Math.floor(Math.random()*colors.length)];
         d.style.animationDuration = (4 + Math.random()*3) + "s";
-        d.style.animationDelay = (Math.random()*0.6) + "s";
         confettiEl.appendChild(d);
       }
     }
-    function clearConfetti() {
-      confettiEl.innerHTML = "";
-    }
-
-    async function marcarSorteado(id) {
-      const { error } = await supabase
-        .from("invitados")
-        .update({ sorteado: true })
-        .eq("id", id);
-      if (error) {
-        console.error(error);
-        Swal.fire("⚠️ Error", "No se pudo actualizar el ganador en la base.", "warning");
-      }
-    }
+    function clearConfetti() { confettiEl.innerHTML = ""; }
 
     async function startSorteo() {
       if (running) return;
-      running = true;
-      btnStart.disabled = true;
-      hideWinner();
+      running = true; btnStart.disabled = true; hideWinner();
 
-      let elegibles;
-      try {
-        elegibles = await fetchElegibles();
-      } catch (e) {
-        running = false;
-        btnStart.disabled = false;
-        return Swal.fire("Error", "No se pudo consultar la base de datos.", "error");
+      // llamamos a la función sortear_asistente
+      const { data, error } = await supabase.rpc("sortear_asistente");
+
+      if (error) {
+        running = false; btnStart.disabled = false;
+        return Swal.fire("⚠️ Error","No se pudo realizar el sorteo.","warning");
       }
 
-      if (!elegibles.length) {
-        running = false;
-        btnStart.disabled = false;
-        return Swal.fire("Sin elegibles", "No quedan personas disponibles para el sorteo.", "info");
+      if (!data || data.length === 0) {
+        running = false; btnStart.disabled = false;
+        return Swal.fire("Sin elegibles","No quedan números disponibles.","info");
       }
 
-      // barajamos para mostrar variedad en la ruleta
-      let pool = shuffle([...elegibles]);
+      const ganador = data[0]; // 👈 ahora siempre array
 
+      // animación visual de la ruleta antes de mostrar el ganador
       const start = performance.now();
       let lastIdx = 0;
-
-      // bucle de “ruleta” con easing
       while (true) {
         const now = performance.now();
-        const t = Math.min(1, (now - start) / DURATION_MS);          // 0..1
+        const t = Math.min(1, (now - start) / DURATION_MS);
         const speed = TICK_MAX_MS - (TICK_MAX_MS - TICK_MIN_MS) * easeOutQuad(t);
-        const idx = Math.floor((now / speed)) % pool.length;
+        const idx = Math.floor((now / speed)) % 10; // solo para variar visualmente
         if (idx !== lastIdx) {
-          setSlotDisplay(pool[idx]);
+          slotText.textContent = `Nº ${Math.floor(Math.random() * 999)}`;
           lastIdx = idx;
         }
         if (t >= 1) break;
-        // micro-sleep para no saturar
-        // (no usamos await sleep(speed) para no perder fluidez con easing)
         await sleep(16);
       }
 
-      // ganador real (no necesariamente el último que se mostró, para evitar sesgos)
-      const ganador = elegibles[Math.floor(Math.random() * elegibles.length)];
-
-      // Revelamos al ganador con mini “ruleta final”
-      for (let i = 0; i < 12; i++) {
-        setSlotDisplay(pool[(lastIdx + i) % pool.length]);
-        await sleep(55 + i*8);
-      }
       setSlotDisplay(ganador);
-
-      // Mostrar overlay y marcar en la base
       showWinner(ganador);
-      await marcarSorteado(ganador.id);
 
-      // Habilitamos “Sortear otro”
       btnNext.disabled = false;
       running = false;
     }
+
 
     async function nextRound() {
       btnNext.disabled = true;
       hideWinner();
       slotText.textContent = "Listo para sortear…";
-      // Reiniciamos el estado y lanzamos directamente el siguiente sorteo
-      await sleep(500); // pequeño respiro visual
+      await sleep(500);
       startSorteo();
     }
 
-    // Eventos
     btnStart.addEventListener("click", startSorteo);
     btnNext.addEventListener("click", nextRound);
   </script>
