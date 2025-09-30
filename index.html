@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/webp" href="./assets/logo.webp" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -17,111 +16,36 @@
       min-height: 100vh;
       padding: 20px;
     }
-
-    .container {
-      width: 100%;
-      max-width: 450px;
-    }
-
-    .logo {
-      display: block;
-      margin: 0 auto 15px;
-      width: 100px;
-      height: auto;
-    }
-
-    h2 { 
-      text-align: center; 
-      color: #1d3557; 
-      margin-bottom: 20px;
-    }
-
+    .container { width: 100%; max-width: 480px; }
+    .logo { display: block; margin: 0 auto 15px; width: 100px; height: auto; }
+    h2 { text-align: center; color: #1d3557; margin-bottom: 20px; }
     form {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      box-sizing: border-box;
+      background: white; padding: 25px; border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); box-sizing: border-box;
     }
-
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-      color: #333;
-    }
-
+    label { display: block; margin-top: 12px; font-weight: bold; color: #333; }
     input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 5px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      width: 100%; padding: 12px; margin-top: 5px;
+      font-size: 16px; border: 1px solid #ccc; border-radius: 6px;
       box-sizing: border-box;
     }
-
     button {
-      background: #1d3557;
-      color: white;
-      cursor: pointer;
-      margin-top: 20px;
-      transition: background 0.2s;
+      background: #1d3557; color: white; cursor: pointer;
+      margin-top: 20px; transition: background 0.2s;
     }
-
-    button:hover:not(:disabled) {
-      background: #457b9d;
-    }
-
-    button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
-
+    button:hover:not(:disabled) { background: #457b9d; }
+    button:disabled { background: #aaa; cursor: not-allowed; }
     .aviso-descuento {
-      background: #f1faee;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-      border-left: 5px solid #1d3557;
+      background: #f1faee; padding: 15px; border-radius: 8px;
+      margin-top: 20px; border-left: 5px solid #1d3557;
     }
-
     .aviso-descuento h3 {
-      margin: 0 0 10px;
-      color: #1d3557;
-      font-size: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin: 0 0 10px; color: #1d3557; font-size: 20px;
+      display: flex; align-items: center; gap: 8px;
     }
-
-    .aviso-descuento h3::before {
-      content: "⚠️";
-      font-size: 22px;
-    }
-
-    .aviso-descuento p {
-      font-size: 15px;
-      margin: 5px 0;
-      color: #333;
-      line-height: 1.4;
-    }
-
-    .precio-opcion::before {
-      content: "💰";
-      margin-right: 4px;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: #555;
-    }
-
-    .footer p {
-      margin: 0;
-    }
+    .aviso-descuento h3::before { content: "⚠️"; font-size: 22px; }
+    .aviso-descuento p { font-size: 15px; margin: 5px 0; color: #333; line-height: 1.4; }
+    .footer { text-align: center; margin-top: 20px; font-size: 14px; color: #555; }
   </style>
 </head>
 <body>
@@ -154,11 +78,11 @@
         <option value='IPU - Colegio Central Universitario "Mariano Moreno"'>IPU - Colegio Central Universitario "Mariano Moreno"</option>
       </select>
 
-      <label for="opciones">Cantidad de opciones</label>
-      <input type="number" id="opciones" name="opciones" min="1" placeholder="Ej: 1" required />
-
       <fieldset style="margin-top:16px; padding:12px; border:1px solid #e0e0e0; border-radius:8px;">
-        <legend style="padding:0 6px; color:#1d3557; font-weight:bold;">Menús especiales (opcional)</legend>
+        <legend style="padding:0 6px; color:#1d3557; font-weight:bold;">Menús</legend>
+
+        <label for="comun">Común / Tradicional</label>
+        <input type="number" name="comun" id="comun" min="0" value="0" />
 
         <label for="celiacos">Celíacos</label>
         <input type="number" name="celiacos" id="celiacos" min="0" value="0" />
@@ -169,22 +93,18 @@
         <label for="veganos">Veganos</label>
         <input type="number" name="veganos" id="veganos" min="0" value="0" />
 
-        <p id="restoMsg" style="margin-top:8px; font-size:14px; color:#333;">
-          Te quedan <b id="restoNum">0</b> de <span id="opTotal">0</span> opciones para asignar a menús especiales.
+        <p id="totalMsg" style="margin-top:8px; font-size:14px; color:#333;">
+          Total de menús: <b id="totalNum">0</b>
         </p>
         <p id="errorMsg" style="display:none; color:#b00020; font-weight:bold; font-size:14px; margin-top:6px;">
-          La suma de menús especiales no puede superar la cantidad de opciones.
+          La cantidad total debe ser al menos 1.
         </p>
       </fieldset>
 
       <div class="aviso-descuento">
         <h3>Importante</h3>
-        <p>
-          Al enviar este formulario, confirmás que aceptás el descuento del <strong>total de las opciones seleccionadas</strong> directamente por <strong>planilla de haberes</strong>, en <strong>4 cuotas iguales</strong>.
-        </p>
-        <p class="precio-opcion">
-          El valor de <strong>cada opción</strong> es de <strong>$50.000</strong>.
-        </p>
+        <p>Al enviar este formulario, confirmás que aceptás el descuento del total de las opciones seleccionadas directamente por planilla de haberes, en 4 cuotas iguales.</p>
+        <p class="precio-opcion">El valor de cada menú es de <strong>$50.000</strong>.</p>
       </div>
 
       <button type="submit" id="submitBtn" disabled>Enviar</button>
@@ -193,26 +113,24 @@
     <footer class="footer">
       <p>© <span id="anio"></span> Universidad Nacional de San Juan – Rectorado</p>
     </footer>
-
   </div>
 
   <script>
     const ENDPOINT_REGISTER = "/api/register";
     const SUPABASE_URL = "https://dlitmctfjzmedssrbazs.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsaXRtY3RmanptZWRzc3JiYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3MTAwNTQsImV4cCI6MjA3NDI4NjA1NH0.ciennL_O5fphj1x_DQ18jW-awBYIWjXRgs5Oxk31TQQ";
-
     const HEADERS = { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY };
 
     const dniInput = document.getElementById("dni");
     const nombreInput = document.getElementById("nombre");
     const submitBtn = document.getElementById("submitBtn");
     const fechaLimite = new Date("2025-11-28T23:59:59");
-    const opcionesInput = document.getElementById("opciones");
+
+    const comunInput = document.getElementById("comun");
     const celiacosInput = document.getElementById("celiacos");
     const vegetarianosInput = document.getElementById("vegetarianos");
     const veganosInput = document.getElementById("veganos");
-    const restoNum = document.getElementById("restoNum");
-    const opTotal = document.getElementById("opTotal");
+    const totalNum = document.getElementById("totalNum");
     const errorMsg = document.getElementById("errorMsg");
 
     let dniValido = false;
@@ -222,52 +140,23 @@
       return Number.isNaN(n) ? 0 : n;
     }
 
-    function validarEspeciales() {
-      const total = int(opcionesInput?.value);
-      const a = int(celiacosInput?.value);
-      const b = int(vegetarianosInput?.value);
-      const c = int(veganosInput?.value);
-      const suma = a + b + c;
-
-      opTotal.textContent = total || 0;
-      const resto = Math.max(0, (total || 0) - suma);
-      restoNum.textContent = resto;
-
-      const invalido = suma > (total || 0);
+    function validarTotal() {
+      const total = int(comunInput.value) + int(celiacosInput.value) + int(vegetarianosInput.value) + int(veganosInput.value);
+      totalNum.textContent = total;
+      const invalido = total < 1;
       errorMsg.style.display = invalido ? "block" : "none";
       submitBtn.disabled = !(dniValido && !invalido);
-
       return !invalido;
     }
 
-    
-    document.addEventListener("DOMContentLoaded", () => {
-      ["input", "change"].forEach(evt => {
-        opcionesInput?.addEventListener(evt, validarEspeciales);
-        celiacosInput?.addEventListener(evt, validarEspeciales);
-        vegetarianosInput?.addEventListener(evt, validarEspeciales);
-        veganosInput?.addEventListener(evt, validarEspeciales);
+    ["input", "change"].forEach(evt => {
+      [comunInput, celiacosInput, vegetarianosInput, veganosInput].forEach(i => {
+        i.addEventListener(evt, validarTotal);
       });
-
-      validarEspeciales();
     });
 
-    function validarFechaLimite() {
-      const ahora = new Date();
-      if (ahora > fechaLimite) {
-        Swal.fire({
-          icon: "warning",
-          title: "⏰ Plazo finalizado",
-          text: "El período para registrarse o retirar entradas ha finalizado (28/11/2025).",
-          confirmButtonText: "Entendido"
-        });
-        return false;
-      }
-      return true;
-    }
-
     dniInput.addEventListener("blur", async () => {
-      if (!validarFechaLimite()) return;
+      if (new Date() > fechaLimite) return;
       const dni = dniInput.value.trim();
       if (!dni) return;
 
@@ -275,99 +164,49 @@
 
       const resp = await fetch(`${SUPABASE_URL}/rest/v1/invitados?dni=eq.${dni}`, { headers: HEADERS });
       const data = await resp.json();
-
       Swal.close();
 
       if (data.length > 0) {
         const invitado = data[0];
-
         if (invitado.retiro === true) {
-          Swal.fire({
-            icon: "warning",
-            title: "⚠️ Retiro ya registrado",
-            text: "Este DNI ya retiró su entrada. No es posible completar un nuevo registro.",
-          });
+          Swal.fire({ icon: "warning", title: "⚠️ Retiro ya registrado", text: "Este DNI ya retiró su entrada." });
           dniValido = false;
           submitBtn.disabled = true;
-          submitBtn.textContent = "Enviar";
           return;
         }
-
-        if (invitado.estado === "inscripto") {
-          Swal.fire({
-            icon: "info",
-            title: "ℹ️ Registro existente",
-            html: `
-              Este DNI ya se encuentra <b>inscripto</b> para la cena.<br><br>
-              Si completás el formulario y lo enviás nuevamente, <b>se actualizará la información existente</b> (nombre, correo, lugar o cantidad de opciones).
-            `,
-            confirmButtonText: "Entendido",
-          });
-          dniValido = true;
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Actualizar registro ✏️";
-          nombreInput.focus();
-          validarEspeciales();
-          return;
-        }
-
-        Swal.fire({
-          icon: "success",
-          title: "✅ DNI validado",
-          text: "Podés completar el formulario.",
-          timer: 1800,
-          showConfirmButton: false
-        });
         dniValido = true;
-        submitBtn.disabled = false;
-        submitBtn.textContent = "Enviar";
-        nombreInput.focus();
-        validarEspeciales();
+        submitBtn.disabled = !validarTotal();
+        Swal.fire({ icon: "success", title: "✅ DNI validado", timer: 1500, showConfirmButton: false });
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "❌ DNI no validado",
-          text: "Este DNI no está habilitado para registrarse.",
-        });
+        Swal.fire({ icon: "error", title: "❌ DNI no habilitado" });
+        dniValido = false;
         submitBtn.disabled = true;
-        submitBtn.textContent = "Enviar";
       }
     });
 
     document.getElementById("form").addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      // validación extra en frontend
-      if (!validarEspeciales()) {
-        Swal.fire({ icon: "error", title: "Revisá los menús especiales", text: "La suma supera la cantidad de opciones." });
+      if (!validarTotal()) {
+        Swal.fire({ icon: "error", title: "Error", text: "Debés seleccionar al menos un menú." });
         return;
       }
-
       const formData = new FormData(e.target);
       const payload = Object.fromEntries(formData.entries());
 
-      Swal.fire({ title: "Registrando...", text: "Esperá un momento...", didOpen: () => Swal.showLoading(), allowOutsideClick: false });
-
-      const res = await fetch(ENDPOINT_REGISTER, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
+      Swal.fire({ title: "Registrando...", didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+      const res = await fetch(ENDPOINT_REGISTER, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const text = await res.text();
       Swal.close();
 
       if (res.ok && text.includes("✅")) {
         Swal.fire({ icon: "success", title: "Registro exitoso 🎉", text });
-        e.target.reset();
-        submitBtn.disabled = true;
+        e.target.reset(); submitBtn.disabled = true; totalNum.textContent = "0";
       } else {
-        Swal.fire({ icon: "error", title: "Hubo un problema 😞", text });
+        Swal.fire({ icon: "error", title: "Hubo un problema", text });
       }
     });
 
     document.getElementById("anio").textContent = new Date().getFullYear();
   </script>
-
 </body>
 </html>
