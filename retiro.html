@@ -9,7 +9,6 @@
     html, body {
       height: 100%;
       margin: 0;
-      overflow: hidden; /* 🔒 evita scroll vertical */
     }
 
     body {
@@ -21,8 +20,19 @@
       justify-content: center;
       align-items: center;
       padding: 20px;
-      height: 100vh;     /* en lugar de min-height */
       box-sizing: border-box;
+    }
+
+    /* Estado inicial: sin scroll, ocupa toda la pantalla */
+    body.initial {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Cuando aparece info: permitimos scroll si se necesita */
+    body.with-info {
+      min-height: 100vh;
+      overflow-y: auto;
     }
 
     h2 {
@@ -58,7 +68,7 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      box-sizing: border-box; /* 📏 evita que se salga del contenedor */
+      box-sizing: border-box;
     }
 
     input:focus {
@@ -68,7 +78,7 @@
     }
 
     button {
-      background: none; /* 🎨 Azul petróleo en lugar de rojo */
+      background: none;
       border: none;
       color: white;
       font-size: 18px;
@@ -77,7 +87,6 @@
     }
 
     button:hover {
-      background: none;
       transform: scale(1.03);
     }
 
@@ -111,9 +120,10 @@
     #info button:hover {
       background: #274a78;
     }
+
   </style>
 </head>
-<body>
+<body class="initial">
   <h2>🎟️ Retiro de Entradas</h2>
 
   <form id="buscarForm">
@@ -196,6 +206,8 @@
       if (!data.length) {
         Swal.fire("❌ No encontrado", "No existe un registro con ese DNI.", "error");
         infoDiv.style.display = "none";
+        document.body.classList.remove("with-info");
+        document.body.classList.add("initial");
         return;
       }
 
@@ -208,10 +220,14 @@
           "warning"
         );
         infoDiv.style.display = "none";
+        document.body.classList.remove("with-info");
+        document.body.classList.add("initial");
         return;
       }
 
       infoDiv.style.display = "block";
+      document.body.classList.remove("initial");
+      document.body.classList.add("with-info");
       infoDiv.innerHTML = `
         <p><b>Nombre:</b> ${inv.nombre}</p>
         <p><b>Correo:</b> ${inv.correo}</p>
