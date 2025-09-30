@@ -54,7 +54,7 @@
     <h2>🎉 Cena de Fin de Año 🎉</h2>
 
     <form id="form">
-      <label for="dni">DNI</label>
+      <label for="dni">DNI <small>(sin puntos ni espacios)</small></label>
       <input type="text" name="dni" id="dni" placeholder="Ej: 12345678" required />
 
       <label for="nombre">Nombre y Apellido</label>
@@ -176,7 +176,13 @@
         }
         dniValido = true;
         submitBtn.disabled = !validarTotal();
-        Swal.fire({ icon: "success", title: "✅ DNI validado", timer: 1500, showConfirmButton: false });
+        Swal.fire({ 
+          icon: "success", 
+          title: "✅ DNI validado", 
+          timer: 1500, 
+          showConfirmButton: false 
+        });
+        nombreInput.focus();
       } else {
         Swal.fire({ icon: "error", title: "❌ DNI no habilitado" });
         dniValido = false;
