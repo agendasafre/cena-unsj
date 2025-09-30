@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
-    :root{
+    :root {
       --g1: #0d47a1;
       --g2: #1976d2;
       --g3: #ffffff;
@@ -75,6 +75,9 @@
       font-weight: 800;
       margin-top: 10px;
     }
+    .winner__card .controls {
+      justify-content: center; /* botón centrado */
+    }
     .confetti { position: fixed; inset: 0; pointer-events: none; }
     .dot {
       position: absolute; width: 8px; height: 8px; border-radius: 50%;
@@ -140,24 +143,6 @@
       slotText.textContent = `Nº ${entrada.numero}`;
     }
 
-    async function fetchElegibles() {
-      const { data, error } = await supabase
-        .from("entradas")
-        .select("id, numero")
-        .eq("entregado", true)
-        .eq("sorteado", false);
-      if (error) throw error;
-      return data || [];
-    }
-
-    async function marcarSorteado(id) {
-      const { error } = await supabase
-        .from("entradas")
-        .update({ sorteado: true })
-        .eq("id", id);
-      if (error) console.error(error);
-    }
-
     function showWinner(entrada) {
       winnerName.textContent = `Nº ${entrada.numero}`;
       winnerEl.classList.add("show");
@@ -187,38 +172,36 @@
       if (running) return;
       running = true; btnStart.disabled = true; hideWinner();
 
-      let elegibles;
-      try { elegibles = await fetchElegibles(); }
-      catch { running=false; btnStart.disabled=false; return Swal.fire("Error","No se pudo consultar.","error"); }
+      // llamamos a la función sortear_asistente
+      const { data: ganador, error } = await supabase.rpc("sortear_asistente");
 
-      if (!elegibles.length) {
-        running=false; btnStart.disabled=false;
+      if (error) {
+        running = false; btnStart.disabled = false;
+        return Swal.fire("⚠️ Error","No se pudo realizar el sorteo.","warning");
+      }
+      if (!ganador) {
+        running = false; btnStart.disabled = false;
         return Swal.fire("Sin elegibles","No quedan números disponibles.","info");
       }
 
-      let pool = shuffle([...elegibles]);
+      // animación visual de la ruleta antes de mostrar el ganador
       const start = performance.now();
       let lastIdx = 0;
-
       while (true) {
         const now = performance.now();
         const t = Math.min(1, (now - start) / DURATION_MS);
         const speed = TICK_MAX_MS - (TICK_MAX_MS - TICK_MIN_MS) * easeOutQuad(t);
-        const idx = Math.floor((now / speed)) % pool.length;
-        if (idx !== lastIdx) { setSlotDisplay(pool[idx]); lastIdx = idx; }
+        const idx = Math.floor((now / speed)) % 10; // solo para variar visualmente
+        if (idx !== lastIdx) {
+          slotText.textContent = `Nº ${Math.floor(Math.random() * 999)}`;
+          lastIdx = idx;
+        }
         if (t >= 1) break;
         await sleep(16);
       }
 
-      const ganador = elegibles[Math.floor(Math.random() * elegibles.length)];
-      for (let i = 0; i < 12; i++) {
-        setSlotDisplay(pool[(lastIdx + i) % pool.length]);
-        await sleep(55 + i*8);
-      }
       setSlotDisplay(ganador);
-
       showWinner(ganador);
-      await marcarSorteado(ganador.id);
 
       btnNext.disabled = false;
       running = false;
