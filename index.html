@@ -36,7 +36,7 @@
     button:hover:not(:disabled) { background: #457b9d; }
     button:disabled { background: #aaa; cursor: not-allowed; }
     .aviso-descuento {
-      background: #ffaa82; padding: 15px; border-radius: 8px;
+      background: #ffc0a2; padding: 15px; border-radius: 8px;
       margin-top: 20px;
     }
     .aviso-descuento h3 {
@@ -82,16 +82,16 @@
         <legend style="padding:0 6px; color:#1d3557; font-weight:bold;">Menús</legend>
 
         <label for="comun">Común / Tradicional</label>
-        <input type="number" name="comun" id="comun" min="0" value="0" />
+        <input type="number" name="comun" id="comun" min="0" placeholder="0" />
 
         <label for="celiacos">Celíacos</label>
-        <input type="number" name="celiacos" id="celiacos" min="0" value="0" />
+        <input type="number" name="celiacos" id="celiacos" min="0" placeholder="0" />
 
         <label for="vegetarianos">Vegetarianos</label>
-        <input type="number" name="vegetarianos" id="vegetarianos" min="0" value="0" />
+        <input type="number" name="vegetarianos" id="vegetarianos" min="0" placeholder="0" />
 
         <label for="veganos">Veganos</label>
-        <input type="number" name="veganos" id="veganos" min="0" value="0" />
+        <input type="number" name="veganos" id="veganos" min="0" placeholder="0" />
 
         <p id="totalMsg" style="margin-top:8px; font-size:14px; color:#333;">
           Total de menús: <b id="totalNum">0</b>
@@ -103,8 +103,8 @@
 
       <div class="aviso-descuento">
         <h3>Importante</h3>
-        <p>Al enviar este formulario, confirmás que <strong>aceptás el descuento</strong> del total de las opciones seleccionadas directamente por planilla de haberes, <strong>en 4 cuotas iguales.</strong></p>
-        <p class="precio-opcion"><strong>El valor de cada menú es de $50.000</strong>.</p>
+        <p>Al enviar este formulario, <strong>aceptás el descuento</strong> del total de las opciones seleccionadas directamente por planilla de haberes, <strong>en 4 cuotas iguales.</strong></p>
+        <p class="precio-opcion"><strong>El valor de cada opción es de $50.000</strong>.</p>
       </div>
 
       <button type="submit" id="submitBtn" disabled>Enviar</button>
@@ -141,7 +141,7 @@
     }
 
     function validarTotal() {
-      const total = int(comunInput.value) + int(celiacosInput.value) + int(vegetarianosInput.value) + int(veganosInput.value);
+      const total = int(comunInput.value ?? 0) + int(celiacosInput.value ?? 0) + int(vegetarianosInput.value ?? 0) + int(veganosInput.value ?? 0);
       totalNum.textContent = total;
       const invalido = total < 1;
       errorMsg.style.display = invalido ? "block" : "none";
