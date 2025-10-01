@@ -124,6 +124,8 @@ export default async function handler(req, res) {
     const response = await fetch(`${scriptUrl}?${query}`, { method: "POST" });
     const text = await response.text();
 
+    console.log("Respuesta Apps Script:", text);
+    
     if (!response.ok || !text.includes("✅")) {
       return res.status(500).send("❌ Error al procesar el registro.");
     }
