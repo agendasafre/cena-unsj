@@ -141,7 +141,7 @@
     }
 
     function validarTotal() {
-      const total = int(comunInput.value ?? 0) + int(celiacosInput.value ?? 0) + int(vegetarianosInput.value ?? 0) + int(veganosInput.value ?? 0);
+      const total = int(comunInput.value) + int(celiacosInput.value) + int(vegetarianosInput.value) + int(veganosInput.value);
       totalNum.textContent = total;
       const invalido = total < 1;
       errorMsg.style.display = invalido ? "block" : "none";
