@@ -9,7 +9,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f6f8;
+      background: linear-gradient(135deg, #1d3557, #457b9d);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -18,7 +18,7 @@
     }
     .container { width: 100%; max-width: 480px; }
     .logo { display: block; margin: 0 auto 15px; width: 100px; height: auto; }
-    h2 { text-align: center; color: #1d3557; margin-bottom: 20px; }
+    h2 { text-align: center; color: #fff; margin-bottom: 20px; }
     form {
       background: white; padding: 25px; border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1); box-sizing: border-box;
@@ -36,16 +36,16 @@
     button:hover:not(:disabled) { background: #457b9d; }
     button:disabled { background: #aaa; cursor: not-allowed; }
     .aviso-descuento {
-      background: #f1faee; padding: 15px; border-radius: 8px;
-      margin-top: 20px; border-left: 5px solid #1d3557;
+      background: #1d3557; padding: 15px; border-radius: 8px;
+      margin-top: 20px;
     }
     .aviso-descuento h3 {
-      margin: 0 0 10px; color: #1d3557; font-size: 20px;
+      margin: 0 0 10px; color: #fff; font-size: 20px;
       display: flex; align-items: center; gap: 8px;
     }
     .aviso-descuento h3::before { content: "⚠️"; font-size: 22px; }
-    .aviso-descuento p { font-size: 15px; margin: 5px 0; color: #333; line-height: 1.4; }
-    .footer { text-align: center; margin-top: 20px; font-size: 14px; color: #555; }
+    .aviso-descuento p { font-size: 15px; margin: 5px 0; color: #fff; line-height: 1.4; }
+    .footer { text-align: center; margin-top: 20px; font-size: 14px; color: #cecece; }
   </style>
 </head>
 <body>
