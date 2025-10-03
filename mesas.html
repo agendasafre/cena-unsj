@@ -42,7 +42,6 @@
       font-size: 14px;
     }
     .asiento.ocupado { background: #b00020; color: #fff; cursor: not-allowed; }
-    .asiento.tuyo { background: #2e7d32; color: #fff; }
     .asiento.seleccionado { background: #1976d2; color: #fff; }
     #btnConfirmar {
       position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
@@ -68,7 +67,8 @@
     }
 
     let invitado = null;
-    let seleccionados = []; // [{mesa_id, posicion}]
+    let seleccionados = [];
+    let mesasGlobal = [];
 
     async function cargarEstado() {
       try {
@@ -80,19 +80,16 @@
         }
         const data = await res.json();
         invitado = data.invitado;
-
-        // 👇 inicializar seleccionados con lo que ya tiene confirmado en DB
+        mesasGlobal = data.mesas;
         seleccionados = [...invitado.asientos_ocupados];
-        render(data);
+        render();
       } catch (err) {
         console.error(err);
         Swal.fire({ title: "Error", text: "No se pudo cargar el estado de mesas", icon: "error" });
       }
     }
 
-    function render(data) {
-      const { mesas } = data;
-
+    function render() {
       document.getElementById("summary").innerHTML = `
         <h2>Hola ${invitado.nombre}</h2>
         <p>Podés elegir <b>${invitado.max_asientos}</b> asientos.<br/>
@@ -102,7 +99,7 @@
       const container = document.getElementById("mesas");
       container.innerHTML = "";
 
-      mesas.forEach(mesa => {
+      mesasGlobal.forEach(mesa => {
         const div = document.createElement("div");
         div.className = "mesa";
         div.innerHTML = `<h3>Mesa ${mesa.numero}</h3>`;
@@ -117,16 +114,13 @@
           btn.textContent = i;
 
           if (ocupado && ocupado.invitado_id !== invitado.id) {
-            // ocupado por otro → no se puede usar
             btn.classList.add("ocupado");
             btn.textContent = `#${i}`;
           } else if (isSelected) {
-            // asiento propio o elegido → lo muestro como seleccionado
             btn.classList.add("seleccionado");
-            btn.textContent = `#${i}\n(Sel.)`;
+            btn.textContent = `#${i}`;
             btn.onclick = () => toggleSeleccion(mesa.id, i);
           } else {
-            // libre → puedo seleccionarlo
             btn.onclick = () => toggleSeleccion(mesa.id, i);
           }
 
@@ -142,7 +136,6 @@
     function toggleSeleccion(mesa_id, posicion) {
       const idx = seleccionados.findIndex(s => s.mesa_id === mesa_id && s.posicion === posicion);
       if (idx >= 0) {
-        // liberar asiento
         seleccionados.splice(idx, 1);
       } else {
         if (seleccionados.length < invitado.max_asientos) {
@@ -151,7 +144,7 @@
           Swal.fire({ title: "Límite alcanzado", text: "Ya seleccionaste todos tus lugares", icon: "info" });
         }
       }
-      render({ mesas: window.lastMesas });
+      render();
     }
 
     function actualizarBoton() {
