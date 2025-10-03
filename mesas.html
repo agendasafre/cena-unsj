@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Elegir Mesa – Cena UNSJ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1d3557, #457b9d);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    .wrap { max-width: 900px; margin: auto; }
+    h1, h2 { text-align: center; }
+    .summary {
+      background: #f1faee; color: #000;
+      padding: 15px; border-radius: 8px; margin-bottom: 20px;
+    }
+    .mesa {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+    }
+    .mesa h3 { margin-top: 0; }
+    .asientos {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 10px;
+    }
+    .asiento {
+      background: #eee;
+      color: #000;
+      text-align: center;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .asiento.ocupado { background: #b00020; color: #fff; cursor: not-allowed; }
+    .asiento.tuyo { background: #2e7d32; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🎉 Elegí tu mesa</h1>
+    <div id="summary" class="summary">Cargando...</div>
+    <div id="mesas"></div>
+  </div>
+
+  <script type="module">
+    const token = new URLSearchParams(window.location.search).get("token");
+    if (!token) {
+      Swal.fire("❌ Error", "Falta token en la URL", "error");
+      throw new Error("No token");
+    }
+
+    async function cargarEstado() {
+      try {
+        const res = await fetch(`/api/mesas?token=${token}`);
+        if (!res.ok) {
+          const msg = await res.text();
+          Swal.fire("⚠️ No disponible", msg, "warning");
+          return;
+        }
+        const data = await res.json();
+        render(data);
+      } catch (err) {
+        console.error(err);
+        Swal.fire("❌ Error", "No se pudo cargar el estado de mesas", "error");
+      }
+    }
+
+    function render(data) {
+      const { invitado, mesas } = data;
+
+      document.getElementById("summary").innerHTML = `
+        <h2>Hola ${invitado.nombre}</h2>
+        <p>Tenés derecho a <b>${invitado.max_asientos}</b> asientos.<br/>
+        Actualmente ocupaste <b>${invitado.asientos_ocupados.length}</b>.</p>
+      `;
+
+      const container = document.getElementById("mesas");
+      container.innerHTML = "";
+
+      mesas.forEach(mesa => {
+        const div = document.createElement("div");
+        div.className = "mesa";
+        div.innerHTML = `<h3>Mesa ${mesa.numero}</h3>`;
+        const grid = document.createElement("div");
+        grid.className = "asientos";
+
+        for (let i = 1; i <= mesa.capacidad; i++) {
+          const ocupado = mesa.mesa_asientos.find(a => a.posicion === i);
+          const btn = document.createElement("div");
+          btn.className = "asiento";
+          btn.textContent = i;
+
+          if (ocupado) {
+            if (ocupado.invitado_id === invitado.id) {
+              btn.classList.add("tuyo");
+              btn.textContent = `#${i}\n(Tuyo)`;
+              btn.onclick = () => liberarAsiento(mesa.id, i);
+            } else {
+              btn.classList.add("ocupado");
+              btn.textContent = `#${i}\n(${ocupado.invitados.nombre})`;
+            }
+          } else {
+            btn.onclick = () => asignarAsiento(mesa.id, i);
+          }
+
+          grid.appendChild(btn);
+        }
+        div.appendChild(grid);
+        container.appendChild(div);
+      });
+    }
+
+    async function asignarAsiento(mesa_id, posicion) {
+      try {
+        const res = await fetch(`/api/mesas`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, mesa_id, posicion }),
+        });
+        const msg = await res.text();
+        if (res.ok) {
+          Swal.fire("✅ Listo", msg, "success");
+          cargarEstado();
+        } else {
+          Swal.fire("⚠️ Error", msg, "warning");
+        }
+      } catch (err) {
+        Swal.fire("❌ Error", "No se pudo asignar el asiento", "error");
+      }
+    }
+
+    async function liberarAsiento(mesa_id, posicion) {
+      try {
+        const res = await fetch(`/api/mesas`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, mesa_id, posicion }),
+        });
+        const msg = await res.text();
+        if (res.ok) {
+          Swal.fire("✅ Liberado", msg, "success");
+          cargarEstado();
+        } else {
+          Swal.fire("⚠️ Error", msg, "warning");
+        }
+      } catch (err) {
+        Swal.fire("❌ Error", "No se pudo liberar el asiento", "error");
+      }
+    }
+
+    cargarEstado();
+  </script>
+</body>
+</html>
