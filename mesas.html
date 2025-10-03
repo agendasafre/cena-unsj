@@ -40,7 +40,7 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
-      white-space: pre-line; /* <-- para mostrar saltos de línea (#i y nombre) */
+      white-space: pre-line;
     }
     .asiento.ocupado { background: #b00020; color: #fff; cursor: not-allowed; }
     .asiento.seleccionado { background: #1976d2; color: #fff; }
@@ -115,18 +115,15 @@
           btn.textContent = i;
 
           if (ocupado && ocupado.invitado_id !== invitado.id) {
-            // Ocupado por otra persona: mostrar nombre
-            btn.classList.add("ocupado");
             const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
+            btn.classList.add("ocupado");
             btn.textContent = `#${i}\n(${nombre})`;
             btn.title = nombre;
           } else if (isSelected) {
-            // Asiento seleccionado (propio actual o elegido ahora)
             btn.classList.add("seleccionado");
             btn.textContent = `#${i}\n(Selecc.)`;
             btn.onclick = () => toggleSeleccion(mesa.id, i);
           } else {
-            // Libre para seleccionar (o propio en DB pero deseleccionado para cambiar)
             btn.onclick = () => toggleSeleccion(mesa.id, i);
           }
 
@@ -165,6 +162,15 @@
     }
 
     document.getElementById("btnConfirmar").onclick = async () => {
+      Swal.fire({
+        title: "Procesando",
+        text: "Confirmando tus asientos...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
       try {
         const res = await fetch(`/api/mesas`, {
           method: "POST",
