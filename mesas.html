@@ -55,7 +55,7 @@
   <script type="module">
     const token = new URLSearchParams(window.location.search).get("token");
     if (!token) {
-      Swal.fire("❌ Error", "Falta token en la URL", "error");
+      Swal.fire({ title: "Error", text: "Falta token en la URL", icon: "error" });
       throw new Error("No token");
     }
 
@@ -148,7 +148,7 @@
         });
         const msg = await res.text();
         if (res.ok) {
-          Swal.fire({ title: "Liberado", text: msg, icon: "success" });
+          Swal.fire({ title: "Listo", text: msg, icon: "success" });
           cargarEstado();
         } else {
           Swal.fire({ title: "Error", text: msg, icon: "warning" });
