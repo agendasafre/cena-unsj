@@ -13,12 +13,25 @@
       margin: 0;
       padding: 20px;
     }
-    .wrap { max-width: 900px; margin: auto; padding-bottom: 80px; }
-    h1, h2 { text-align: center; }
-    .summary {
-      background: #f1faee; color: #000;
-      padding: 15px; border-radius: 8px; margin-bottom: 20px;
+
+    .wrap {
+      max-width: 900px;
+      margin: auto;
+      padding-bottom: 80px;
     }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .summary {
+      background: #f1faee;
+      color: #000;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
     .mesa {
       background: rgba(255,255,255,0.1);
       border: 1px solid #ccc;
@@ -26,12 +39,18 @@
       padding: 15px;
       margin: 15px 0;
     }
-    .mesa h3 { margin-top: 0; }
+
+    .mesa h3 {
+      margin-top: 0;
+      text-align: center;
+    }
+
     .asientos {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
       gap: 10px;
     }
+
     .asiento {
       background: #eee;
       color: #000;
@@ -41,15 +60,87 @@
       cursor: pointer;
       font-size: 14px;
       white-space: pre-line;
+      transition: transform 0.2s ease, background 0.2s ease;
     }
-    .asiento.ocupado { background: #b00020; color: #fff; cursor: not-allowed; }
-    .asiento.seleccionado { background: #1976d2; color: #fff; }
+    .asiento:hover {
+      transform: scale(1.05);
+    }
+    .asiento.ocupado {
+      background: #b00020;
+      color: #fff;
+      cursor: not-allowed;
+    }
+    .asiento.seleccionado {
+      background: #1976d2;
+      color: #fff;
+    }
+
     #btnConfirmar {
-      position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
-      padding: 12px 20px; font-size: 16px; border: none; border-radius: 8px;
-      background: #1d3557; color: #fff; cursor: pointer; opacity: 0.7;
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #1d3557;
+      color: #fff;
+      cursor: pointer;
+      opacity: 0.7;
+      width: auto;
+      max-width: 300px;
     }
-    #btnConfirmar.enabled { opacity: 1; background: #2e7d32; }
+    #btnConfirmar.enabled {
+      opacity: 1;
+      background: #2e7d32;
+    }
+
+    /* 🔽 RESPONSIVE */
+
+    /* Tablets */
+    @media (max-width: 1024px) {
+      .asientos {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+
+    /* Celulares grandes */
+    @media (max-width: 768px) {
+      .wrap {
+        padding: 10px;
+      }
+      .asientos {
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .asiento {
+        font-size: 13px;
+        padding: 8px;
+      }
+      #btnConfirmar {
+        width: 90%;
+        max-width: none;
+      }
+    }
+
+    /* Celulares chicos */
+    @media (max-width: 480px) {
+      .asientos {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+      .asiento {
+        font-size: 12px;
+        padding: 6px;
+      }
+      h1, h2 {
+        font-size: 18px;
+      }
+      .mesa h3 {
+        font-size: 16px;
+      }
+    }
+
   </style>
 </head>
 <body>
