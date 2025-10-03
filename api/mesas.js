@@ -27,11 +27,11 @@ export default async function handler(req, res) {
     const invitado = invitadoData?.[0];
 
     if (!invitado) {
-      return res.status(404).send("❌ Token inválido");
+      return res.status(404).send("Token inválido");
     }
 
     if (!invitado.retiro) {
-      return res.status(403).send("⚠️ Todavía no retiraste tu entrada, no podés elegir mesa");
+      return res.status(403).send("Todavía no retiraste tu entrada, no podés elegir mesa");
     }
 
     if (req.method === "GET") {
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
       const { mesa_id, posicion } = req.body;
 
       if (!mesa_id || !posicion) {
-        return res.status(400).send("❌ Faltan mesa_id o posicion");
+        return res.status(400).send("Faltan mesa_id o posicion");
       }
 
       // Verificar cuántos asientos ya tiene ocupados
@@ -76,7 +76,7 @@ export default async function handler(req, res) {
       const ocupados = await ocupadosResp.json();
 
       if (ocupados.length >= invitado.opciones) {
-        return res.status(400).send("⚠️ Ya ocupaste todos los asientos que te corresponden");
+        return res.status(400).send("Ya ocupaste todos los asientos que te corresponden");
       }
 
       // Intentar insertar asiento
@@ -92,10 +92,10 @@ export default async function handler(req, res) {
 
       if (!insertResp.ok) {
         const txt = await insertResp.text();
-        return res.status(400).send(`❌ No se pudo asignar asiento (quizás ya está ocupado). ${txt}`);
+        return res.status(400).send(`No se pudo asignar asiento (quizás ya está ocupado). ${txt}`);
       }
 
-      return res.status(200).send("✅ Asiento asignado correctamente");
+      return res.status(200).send("Asiento asignado correctamente");
     }
 
     if (req.method === "DELETE") {
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
       const { mesa_id, posicion } = req.body;
 
       if (!mesa_id || !posicion) {
-        return res.status(400).send("❌ Faltan mesa_id o posicion");
+        return res.status(400).send("Faltan mesa_id o posicion");
       }
 
       const deleteResp = await fetch(
@@ -112,10 +112,10 @@ export default async function handler(req, res) {
       );
 
       if (!deleteResp.ok) {
-        return res.status(400).send("❌ No se pudo liberar el asiento");
+        return res.status(400).send("No se pudo liberar el asiento");
       }
 
-      return res.status(200).send("✅ Asiento liberado");
+      return res.status(200).send("Asiento liberado");
     }
 
     return res.status(405).send("Método no permitido");

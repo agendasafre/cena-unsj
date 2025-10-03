@@ -80,7 +80,7 @@
 
       document.getElementById("summary").innerHTML = `
         <h2>Hola ${invitado.nombre}</h2>
-        <p>Tenés derecho a <b>${invitado.max_asientos}</b> asientos.<br/>
+        <p>Podés seleccionar <b>${invitado.max_asientos}</b> asientos.<br/>
         Actualmente ocupaste <b>${invitado.asientos_ocupados.length}</b>.</p>
       `;
 
@@ -129,13 +129,13 @@
         });
         const msg = await res.text();
         if (res.ok) {
-          Swal.fire("✅ Listo", msg, "success");
+          Swal.fire({ title: "Listo", text: msg, icon: "success" });
           cargarEstado();
         } else {
-          Swal.fire("⚠️ Error", msg, "warning");
+          Swal.fire({ title: "Error", text: msg, icon: "warning" });
         }
       } catch (err) {
-        Swal.fire("❌ Error", "No se pudo asignar el asiento", "error");
+        Swal.fire({ title: "Error", text: "No se pudo asignar el asiento", icon: "error" });
       }
     }
 
@@ -148,13 +148,13 @@
         });
         const msg = await res.text();
         if (res.ok) {
-          Swal.fire("✅ Liberado", msg, "success");
+          Swal.fire({ title: "Liberado", text: msg, icon: "success" });
           cargarEstado();
         } else {
-          Swal.fire("⚠️ Error", msg, "warning");
+          Swal.fire({ title: "Error", text: msg, icon: "warning" });
         }
       } catch (err) {
-        Swal.fire("❌ Error", "No se pudo liberar el asiento", "error");
+        Swal.fire({ title: "Error", text: "No se pudo liberar el asiento", icon: "error" });
       }
     }
 
