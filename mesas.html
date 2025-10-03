@@ -13,25 +13,12 @@
       margin: 0;
       padding: 20px;
     }
-
-    .wrap {
-      max-width: 900px;
-      margin: auto;
-      padding-bottom: 80px;
-    }
-
-    h1, h2 {
-      text-align: center;
-    }
-
+    .wrap { max-width: 900px; margin: auto; padding-bottom: 80px; }
+    h1, h2 { text-align: center; }
     .summary {
-      background: #f1faee;
-      color: #000;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
+      background: #f1faee; color: #000;
+      padding: 15px; border-radius: 8px; margin-bottom: 20px;
     }
-
     .mesa {
       background: rgba(255,255,255,0.1);
       border: 1px solid #ccc;
@@ -39,108 +26,95 @@
       padding: 15px;
       margin: 15px 0;
     }
-
-    .mesa h3 {
-      margin-top: 0;
-      text-align: center;
-    }
+    .mesa h3 { margin-top: 0; text-align: center; }
 
     .asientos {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
-      gap: 10px;
+      gap: 15px;
+      justify-items: center;
     }
 
     .asiento {
-      background: #eee;
-      color: #000;
-      text-align: center;
-      padding: 10px;
-      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       cursor: pointer;
       font-size: 14px;
-      white-space: pre-line;
       transition: transform 0.2s ease, background 0.2s ease;
     }
-    .asiento:hover {
+
+    .asiento .circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .asiento .label {
+      font-size: 12px;
+      color: #fff;
+      text-align: center;
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .asiento:hover .circle {
       transform: scale(1.05);
     }
-    .asiento.ocupado {
+
+    .asiento.ocupado .circle {
       background: #b00020;
       color: #fff;
-      cursor: not-allowed;
     }
-    .asiento.seleccionado {
+    .asiento.ocupado .label {
+      color: #ffdddd;
+    }
+
+    .asiento.seleccionado .circle {
       background: #1976d2;
       color: #fff;
     }
+    .asiento.seleccionado .label {
+      color: #bbdefb;
+    }
 
     #btnConfirmar {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background: #1d3557;
-      color: #fff;
-      cursor: pointer;
-      opacity: 0.7;
-      width: auto;
-      max-width: 300px;
+      position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+      padding: 12px 20px; font-size: 16px; border: none; border-radius: 8px;
+      background: #1d3557; color: #fff; cursor: pointer; opacity: 0.7;
+      width: auto; max-width: 300px;
     }
     #btnConfirmar.enabled {
-      opacity: 1;
-      background: #2e7d32;
+      opacity: 1; background: #2e7d32;
     }
 
-    /* 🔽 RESPONSIVE */
-
-    /* Tablets */
+    /* Responsivo */
     @media (max-width: 1024px) {
-      .asientos {
-        grid-template-columns: repeat(6, 1fr);
-      }
+      .asientos { grid-template-columns: repeat(6, 1fr); }
     }
-
-    /* Celulares grandes */
     @media (max-width: 768px) {
-      .wrap {
-        padding: 10px;
-      }
-      .asientos {
-        grid-template-columns: repeat(4, 1fr);
-      }
-      .asiento {
-        font-size: 13px;
-        padding: 8px;
-      }
-      #btnConfirmar {
-        width: 90%;
-        max-width: none;
-      }
+      .wrap { padding: 10px; }
+      .asientos { grid-template-columns: repeat(4, 1fr); }
+      .asiento .circle { width: 40px; height: 40px; font-size: 13px; }
+      .asiento .label { font-size: 11px; max-width: 50px; }
+      #btnConfirmar { width: 90%; max-width: none; }
     }
-
-    /* Celulares chicos */
     @media (max-width: 480px) {
-      .asientos {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-      }
-      .asiento {
-        font-size: 12px;
-        padding: 6px;
-      }
-      h1, h2 {
-        font-size: 18px;
-      }
-      .mesa h3 {
-        font-size: 16px;
-      }
+      .asientos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .asiento .circle { width: 36px; height: 36px; font-size: 12px; }
+      .asiento .label { font-size: 10px; max-width: 45px; }
+      h1, h2 { font-size: 18px; }
+      .mesa h3 { font-size: 16px; }
     }
-
   </style>
 </head>
 <body>
@@ -186,7 +160,6 @@
         <h2>Hola ${invitado.nombre}</h2>
         <p>Podés elegir <b>${invitado.max_asientos}</b> asientos.<br/>
         Actualmente seleccionaste ${seleccionados.length}.</p>
-        <p>Si querés cambiar tu selección, simplemente hacé click en el/los asiento/s seleccionado/s para deseleccionarlo/s y elegí otro/s.</p>
       `;
 
       const container = document.getElementById("mesas");
@@ -202,20 +175,25 @@
         for (let i = 1; i <= mesa.capacidad; i++) {
           const ocupado = mesa.mesa_asientos.find(a => a.posicion === i);
           const isSelected = seleccionados.some(s => s.mesa_id === mesa.id && s.posicion === i);
+
           const btn = document.createElement("div");
           btn.className = "asiento";
-          btn.textContent = i;
+          btn.innerHTML = `
+            <div class="circle">#${i}</div>
+            <div class="label"></div>
+          `;
 
           if (ocupado && ocupado.invitado_id !== invitado.id) {
-            const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
             btn.classList.add("ocupado");
-            btn.textContent = `#${i}\n(${nombre})`;
+            const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
+            btn.querySelector(".label").textContent = nombre;
             btn.title = nombre;
           } else if (isSelected) {
             btn.classList.add("seleccionado");
-            btn.textContent = `#${i}\n(Selecc.)`;
+            btn.querySelector(".label").textContent = "Seleccionado";
             btn.onclick = () => toggleSeleccion(mesa.id, i);
           } else {
+            btn.querySelector(".label").textContent = "";
             btn.onclick = () => toggleSeleccion(mesa.id, i);
           }
 
