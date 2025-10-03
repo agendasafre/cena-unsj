@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Elegir Mesa – Cena UNSJ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1d3557, #457b9d);
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    .wrap { max-width: 900px; margin: auto; padding-bottom: 80px; }
+    h1, h2 { text-align: center; }
+    .summary {
+      background: #f1faee; color: #000;
+      padding: 15px; border-radius: 8px; margin-bottom: 20px;
+    }
+    .mesa {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 15px;
+      margin: 15px 0;
+    }
+    .mesa h3 { margin-top: 0; }
+    .asientos {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 10px;
+    }
+    .asiento {
+      background: #eee;
+      color: #000;
+      text-align: center;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      white-space: pre-line; /* <-- para mostrar saltos de línea (#i y nombre) */
+    }
+    .asiento.ocupado { background: #b00020; color: #fff; cursor: not-allowed; }
+    .asiento.seleccionado { background: #1976d2; color: #fff; }
+    #btnConfirmar {
+      position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+      padding: 12px 20px; font-size: 16px; border: none; border-radius: 8px;
+      background: #1d3557; color: #fff; cursor: pointer; opacity: 0.7;
+    }
+    #btnConfirmar.enabled { opacity: 1; background: #2e7d32; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Elegí tu mesa</h1>
+    <div id="summary" class="summary">Cargando...</div>
+    <div id="mesas"></div>
+  </div>
+  <button id="btnConfirmar" disabled>Confirmar selección</button>
+
+  <script type="module">
+    const token = new URLSearchParams(window.location.search).get("token");
+    if (!token) {
+      Swal.fire({ title: "Error", text: "Falta token en la URL", icon: "error" });
+      throw new Error("No token");
+    }
+
+    let invitado = null;
+    let seleccionados = [];
+    let mesasGlobal = [];
+
+    async function cargarEstado() {
+      try {
+        const res = await fetch(`/api/mesas?token=${token}`);
+        if (!res.ok) {
+          const msg = await res.text();
+          Swal.fire({ title: "No disponible", text: msg, icon: "warning" });
+          return;
+        }
+        const data = await res.json();
+        invitado = data.invitado;
+        mesasGlobal = data.mesas;
+        seleccionados = [...invitado.asientos_ocupados];
+        render();
+      } catch (err) {
+        console.error(err);
+        Swal.fire({ title: "Error", text: "No se pudo cargar el estado de mesas", icon: "error" });
+      }
+    }
+
+    function render() {
+      document.getElementById("summary").innerHTML = `
+        <h2>Hola ${invitado.nombre}</h2>
+        <p>Podés elegir <b>${invitado.max_asientos}</b> asientos.<br/>
+        Actualmente seleccionaste ${seleccionados.length}.</p>
+      `;
+
+      const container = document.getElementById("mesas");
+      container.innerHTML = "";
+
+      mesasGlobal.forEach(mesa => {
+        const div = document.createElement("div");
+        div.className = "mesa";
+        div.innerHTML = `<h3>Mesa ${mesa.numero}</h3>`;
+        const grid = document.createElement("div");
+        grid.className = "asientos";
+
+        for (let i = 1; i <= mesa.capacidad; i++) {
+          const ocupado = mesa.mesa_asientos.find(a => a.posicion === i);
+          const isSelected = seleccionados.some(s => s.mesa_id === mesa.id && s.posicion === i);
+          const btn = document.createElement("div");
+          btn.className = "asiento";
+          btn.textContent = i;
+
+          if (ocupado && ocupado.invitado_id !== invitado.id) {
+            // Ocupado por otra persona: mostrar nombre
+            btn.classList.add("ocupado");
+            const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
+            btn.textContent = `#${i}\n(${nombre})`;
+            btn.title = nombre;
+          } else if (isSelected) {
+            // Asiento seleccionado (propio actual o elegido ahora)
+            btn.classList.add("seleccionado");
+            btn.textContent = `#${i}\n(Selecc.)`;
+            btn.onclick = () => toggleSeleccion(mesa.id, i);
+          } else {
+            // Libre para seleccionar (o propio en DB pero deseleccionado para cambiar)
+            btn.onclick = () => toggleSeleccion(mesa.id, i);
+          }
+
+          grid.appendChild(btn);
+        }
+        div.appendChild(grid);
+        container.appendChild(div);
+      });
+
+      actualizarBoton();
+    }
+
+    function toggleSeleccion(mesa_id, posicion) {
+      const idx = seleccionados.findIndex(s => s.mesa_id === mesa_id && s.posicion === posicion);
+      if (idx >= 0) {
+        seleccionados.splice(idx, 1);
+      } else {
+        if (seleccionados.length < invitado.max_asientos) {
+          seleccionados.push({ mesa_id, posicion });
+        } else {
+          Swal.fire({ title: "Límite alcanzado", text: "Ya seleccionaste todos tus lugares", icon: "info" });
+        }
+      }
+      render();
+    }
+
+    function actualizarBoton() {
+      const btn = document.getElementById("btnConfirmar");
+      if (seleccionados.length === invitado.max_asientos) {
+        btn.disabled = false;
+        btn.classList.add("enabled");
+      } else {
+        btn.disabled = true;
+        btn.classList.remove("enabled");
+      }
+    }
+
+    document.getElementById("btnConfirmar").onclick = async () => {
+      try {
+        const res = await fetch(`/api/mesas`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, seleccionados }),
+        });
+        const msg = await res.text();
+        if (res.ok) {
+          Swal.fire({ title: "Confirmado", text: msg, icon: "success" });
+          seleccionados = [];
+          cargarEstado();
+        } else {
+          Swal.fire({ title: "Error", text: msg, icon: "error" });
+        }
+      } catch (err) {
+        Swal.fire({ title: "Error", text: "No se pudo confirmar la selección", icon: "error" });
+      }
+    };
+
+    cargarEstado();
+  </script>
+</body>
+</html>
