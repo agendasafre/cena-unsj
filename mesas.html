@@ -82,7 +82,7 @@
     }
 
     .asiento.ocupado .circle {
-      background: #b00020;
+      background: #b94f62;
       color: #fff;
     }
     .asiento.ocupado .label {
@@ -119,7 +119,7 @@
     }
     @media (max-width: 480px) {
       .asientos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .asiento .circle { width: 70px; height: 70px; font-size: 20px; }
+      .asiento .circle { width: 70px; height: 70px; font-size: 40px; }
       .asiento .label { font-size: 14px; max-width: 45px; }
       h1 { font-size: 32px; }
       .mesa h3 { font-size: 24px; }
@@ -187,24 +187,41 @@
 
           const btn = document.createElement("div");
           btn.className = "asiento";
-          btn.innerHTML = `
-            <div class="circle">&#x1FA91;</div>
-            <div class="label"></div>
-          `;
-
+          let emoji = "&#x1FA91;"; // 🪑 por defecto (libre)
           if (ocupado && ocupado.invitado_id !== invitado.id) {
             btn.classList.add("ocupado");
             const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
             btn.querySelector(".label").textContent = nombre;
             btn.title = nombre;
+            emoji = "&#x1F6AB;"; // 🚫 ocupado por otro
           } else if (isSelected) {
             btn.classList.add("seleccionado");
             btn.querySelector(".label").textContent = "Vos";
             btn.onclick = () => toggleSeleccion(mesa.id, i);
+            emoji = "&#x2B50;"; // ⭐ seleccionado por vos
           } else {
             btn.querySelector(".label").textContent = "";
             btn.onclick = () => toggleSeleccion(mesa.id, i);
           }
+
+          btn.innerHTML = `
+            <div class="circle">${emoji}</div>
+            <div class="label"></div>
+          `;
+
+          // if (ocupado && ocupado.invitado_id !== invitado.id) {
+          //   btn.classList.add("ocupado");
+          //   const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
+          //   btn.querySelector(".label").textContent = nombre;
+          //   btn.title = nombre;
+          // } else if (isSelected) {
+          //   btn.classList.add("seleccionado");
+          //   btn.querySelector(".label").textContent = "Vos";
+          //   btn.onclick = () => toggleSeleccion(mesa.id, i);
+          // } else {
+          //   btn.querySelector(".label").textContent = "";
+          //   btn.onclick = () => toggleSeleccion(mesa.id, i);
+          // }
 
           grid.appendChild(btn);
         }
