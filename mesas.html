@@ -5,6 +5,7 @@
   <title>Elegir Mesa – Cena UNSJ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/webp" href="./assets/logo.webp" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
@@ -81,10 +82,16 @@
       transform: scale(1.05);
     }
 
+    .asiento.ocupado {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
     .asiento.ocupado .circle {
-      background: #b94f62;
+      background: #b00020;
       color: #fff;
     }
+
     .asiento.ocupado .label {
       color: #ffdddd;
     }
@@ -93,6 +100,11 @@
       background: #1976d2;
       color: #fff;
     }
+
+    .asiento .fa-chair { color: #e0e0e0; font-size: 28px; }
+    .asiento .fa-user-slash { color: #ffb4b4; font-size: 28px; }
+    .asiento .fa-star { color: #ffeb3b; font-size: 28px; }
+
     .asiento.seleccionado .label {
       color: #bbdefb;
     }
@@ -187,31 +199,38 @@
 
           const btn = document.createElement("div");
           btn.className = "asiento";
-          let emoji = "&#x1FA91;"; // 🪑 por defecto (libre)
-          if (ocupado && ocupado.invitado_id !== invitado.id) {
-            emoji = "&#x1F6AB;"; // 🚫 ocupado por otro
-          } else if (isSelected) {
-            emoji = "&#x2B50;"; // ⭐ seleccionado por vos
+          // Determinar estado del asiento
+          const ocupadoPorOtro = ocupado && ocupado.invitado_id !== invitado.id;
+          const esSeleccionado = isSelected;
+
+          // Determinar ícono, texto, clase y acción
+          let icon = '<i class="fa-solid fa-chair"></i>'; // libre por defecto
+          let label = "";
+          let title = "";
+          let claseExtra = "";
+          let onClick = () => toggleSeleccion(mesa.id, i);
+
+          if (ocupadoPorOtro) {
+            icon = '<i class="fa-solid fa-user-slash"></i>'; // ocupado
+            label = ocupado?.invitados?.nombre || "Ocupado";
+            title = label;
+            claseExtra = "ocupado";
+            onClick = null; // desactiva clic
+          } else if (esSeleccionado) {
+            icon = '<i class="fa-solid fa-star"></i>'; // tu selección
+            label = "Vos";
+            claseExtra = "seleccionado";
           }
 
+          // Render
+          btn.className = `asiento ${claseExtra}`.trim();
           btn.innerHTML = `
-            <div class="circle">${emoji}</div>
-            <div class="label"></div>
+            <div class="circle">${icon}</div>
+            <div class="label">${label}</div>
           `;
 
-          if (ocupado && ocupado.invitado_id !== invitado.id) {
-            btn.classList.add("ocupado");
-            const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
-            btn.querySelector(".label").textContent = nombre;
-            btn.title = nombre;
-          } else if (isSelected) {
-            btn.classList.add("seleccionado");
-            btn.querySelector(".label").textContent = "Vos";
-            btn.onclick = () => toggleSeleccion(mesa.id, i);
-          } else {
-            btn.querySelector(".label").textContent = "";
-            btn.onclick = () => toggleSeleccion(mesa.id, i);
-          }
+          if (title) btn.title = title;
+          if (onClick) btn.onclick = onClick;
 
           grid.appendChild(btn);
         }
