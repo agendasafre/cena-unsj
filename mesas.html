@@ -113,7 +113,7 @@
       .asientos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
       .asiento .circle { width: 50px; height: 50px; font-size: 14px; }
       .asiento .label { font-size: 14px; max-width: 45px; }
-      h1, h2 { font-size: 18px; }
+      h1 { font-size: 32px; }
       .mesa h3 { font-size: 16px; }
     }
   </style>
@@ -158,10 +158,9 @@
 
     function render() {
       document.getElementById("summary").innerHTML = `
-        <h1>Hola ${invitado.nombre}</h1>
         <p>Podés elegir <b>${invitado.max_asientos}</b> asientos.<br/>
         Actualmente seleccionaste ${seleccionados.length}.</p>
-        <p>Si queres cambiar tu selección, simplemente hacé click en el/los asiento/s seleccionado/s para deseleccionarlo/s y elegí otro/s</p>
+        <p>Si querés <b>cambiar tu selección</b>, simplemente <b>hacé click en el/los asiento/s seleccionado/s</b> para deseleccionarlo/s y <b>elegí otro/s</b></p>
       `;
 
       const container = document.getElementById("mesas");
