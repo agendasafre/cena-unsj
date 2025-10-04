@@ -118,7 +118,7 @@ export default async function handler(req, res) {
             dni: invitado.dni,
             nombre: invitado.nombre,
             correo: invitado.correo,
-            token: invitado.mesa_token,
+            mesa_token: token,
             asientos: seleccionados,
           }),
         });
