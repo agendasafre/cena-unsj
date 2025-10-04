@@ -104,8 +104,8 @@
     }
 
     .asiento .fa-chair { color: #fff; font-size: 28px; }
-    .asiento .fa-chair { color: #ffb4b4; font-size: 28px; }
-    .asiento .fa-user { color: #55a1ed; font-size: 28px; }
+    .asiento .fa-chair .ocupado { color: #ffb4b4; font-size: 28px; }
+    .asiento .fa-chair .seleccionado{ color: #90c0e8; font-size: 28px; }
 
     #btnConfirmar {
       position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
@@ -209,13 +209,13 @@
           let onClick = () => toggleSeleccion(mesa.id, i);
 
           if (ocupadoPorOtro) {
-            icon = '<i class="fa-solid fa-user-slash"></i>'; // ocupado
+            icon = '<i class="fa-solid fa-chair ocupado"></i>'; // ocupado
             label = ocupado?.invitados?.nombre || "Ocupado";
             title = label;
             claseExtra = "ocupado";
             onClick = null; // desactiva clic
           } else if (esSeleccionado) {
-            icon = '<i class="fa-solid fa-star"></i>'; // tu selección
+            icon = '<i class="fa-solid fa-chair seleccionado"></i>'; // tu selección
             label = "Vos";
             claseExtra = "seleccionado";
           }
