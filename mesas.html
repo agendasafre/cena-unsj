@@ -38,10 +38,12 @@
     .asiento {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: center;       /* centra horizontalmente */
+      justify-content: flex-start;
       cursor: pointer;
       font-size: 14px;
       transition: transform 0.2s ease, background 0.2s ease;
+      text-align: center;        /* centra texto dentro del bloque */
     }
 
     .asiento .circle {
@@ -58,7 +60,7 @@
     }
 
     .asiento .label {
-      font-size: 12px;
+      font-size: 14px;
       color: #fff;
       text-align: center;
       white-space: normal;   /* ✅ permite varias líneas */
@@ -103,14 +105,14 @@
     @media (max-width: 768px) {
       .wrap { padding: 10px; }
       .asientos { grid-template-columns: repeat(4, 1fr); }
-      .asiento .circle { width: 40px; height: 40px; font-size: 13px; }
-      .asiento .label { font-size: 11px; max-width: 50px; }
+      .asiento .circle { width:50px; height:50px; font-size: 14px; }
+      .asiento .label { font-size: 12px; max-width: 50px; }
       #btnConfirmar { width: 90%; max-width: none; }
     }
     @media (max-width: 480px) {
       .asientos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .asiento .circle { width: 36px; height: 36px; font-size: 12px; }
-      .asiento .label { font-size: 10px; max-width: 45px; }
+      .asiento .circle { width: 50px; height: 50px; font-size: 14px; }
+      .asiento .label { font-size: 14px; max-width: 45px; }
       h1, h2 { font-size: 18px; }
       .mesa h3 { font-size: 16px; }
     }
@@ -156,9 +158,10 @@
 
     function render() {
       document.getElementById("summary").innerHTML = `
-        <h2>Hola ${invitado.nombre}</h2>
+        <h1>Hola ${invitado.nombre}</h1>
         <p>Podés elegir <b>${invitado.max_asientos}</b> asientos.<br/>
         Actualmente seleccionaste ${seleccionados.length}.</p>
+        <p>Si queres cambiar tu selección, simplemente hacé click en el/los asiento/s seleccionado/s para deseleccionarlo/s y elegí otro/s</p>
       `;
 
       const container = document.getElementById("mesas");
@@ -189,7 +192,7 @@
             btn.title = nombre;
           } else if (isSelected) {
             btn.classList.add("seleccionado");
-            btn.querySelector(".label").textContent = "Seleccionado";
+            btn.querySelector(".label").textContent = "Vos";
             btn.onclick = () => toggleSeleccion(mesa.id, i);
           } else {
             btn.querySelector(".label").textContent = "";
