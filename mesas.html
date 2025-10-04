@@ -53,8 +53,10 @@
     }
 
     .asiento .circle {
-      width: 48px;
-      height: 48px;
+      width: 70px;
+      height: 70px;
+      font-size: 40px;
+      line-height: 1;
       border-radius: 50%;
       background: #eee;
       display: flex;
@@ -112,13 +114,12 @@
     @media (max-width: 768px) {
       .wrap { padding: 10px; }
       .asientos { grid-template-columns: repeat(4, 1fr); }
-      .asiento .circle { width:70px; height:70px; font-size: 18px; }
       .asiento .label { font-size: 18px; max-width: 50px; }
       #btnConfirmar { width: 90%; max-width: none; }
     }
     @media (max-width: 480px) {
       .asientos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .asiento .circle { width: 70px; height: 70px; font-size: 14px; }
+      .asiento .circle { width: 70px; height: 70px; font-size: 20px; }
       .asiento .label { font-size: 14px; max-width: 45px; }
       h1 { font-size: 32px; }
       .mesa h3 { font-size: 24px; }
@@ -187,7 +188,7 @@
           const btn = document.createElement("div");
           btn.className = "asiento";
           btn.innerHTML = `
-            <div class="circle">#${i}</div>
+            <div class="circle">&#x1FA91;</div>
             <div class="label"></div>
           `;
 
