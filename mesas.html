@@ -189,19 +189,9 @@
           btn.className = "asiento";
           let emoji = "&#x1FA91;"; // 🪑 por defecto (libre)
           if (ocupado && ocupado.invitado_id !== invitado.id) {
-            btn.classList.add("ocupado");
-            const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
-            btn.querySelector(".label").textContent = nombre;
-            btn.title = nombre;
             emoji = "&#x1F6AB;"; // 🚫 ocupado por otro
           } else if (isSelected) {
-            btn.classList.add("seleccionado");
-            btn.querySelector(".label").textContent = "Vos";
-            btn.onclick = () => toggleSeleccion(mesa.id, i);
             emoji = "&#x2B50;"; // ⭐ seleccionado por vos
-          } else {
-            btn.querySelector(".label").textContent = "";
-            btn.onclick = () => toggleSeleccion(mesa.id, i);
           }
 
           btn.innerHTML = `
@@ -209,19 +199,19 @@
             <div class="label"></div>
           `;
 
-          // if (ocupado && ocupado.invitado_id !== invitado.id) {
-          //   btn.classList.add("ocupado");
-          //   const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
-          //   btn.querySelector(".label").textContent = nombre;
-          //   btn.title = nombre;
-          // } else if (isSelected) {
-          //   btn.classList.add("seleccionado");
-          //   btn.querySelector(".label").textContent = "Vos";
-          //   btn.onclick = () => toggleSeleccion(mesa.id, i);
-          // } else {
-          //   btn.querySelector(".label").textContent = "";
-          //   btn.onclick = () => toggleSeleccion(mesa.id, i);
-          // }
+          if (ocupado && ocupado.invitado_id !== invitado.id) {
+            btn.classList.add("ocupado");
+            const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
+            btn.querySelector(".label").textContent = nombre;
+            btn.title = nombre;
+          } else if (isSelected) {
+            btn.classList.add("seleccionado");
+            btn.querySelector(".label").textContent = "Vos";
+            btn.onclick = () => toggleSeleccion(mesa.id, i);
+          } else {
+            btn.querySelector(".label").textContent = "";
+            btn.onclick = () => toggleSeleccion(mesa.id, i);
+          }
 
           grid.appendChild(btn);
         }
