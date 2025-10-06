@@ -5,6 +5,7 @@
   <title>Elegir Mesa – Cena UNSJ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/webp" href="./assets/logo.webp" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
@@ -53,10 +54,12 @@
     }
 
     .asiento .circle {
-      width: 48px;
-      height: 48px;
+      width: 70px;
+      height: 70px;
+      font-size: 40px;
+      line-height: 1;
       border-radius: 50%;
-      background: #eee;
+      background: #e9e9e9;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -79,21 +82,30 @@
       transform: scale(1.05);
     }
 
+    .asiento.ocupado {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
     .asiento.ocupado .circle {
       background: #b00020;
-      color: #fff;
     }
+
     .asiento.ocupado .label {
       color: #ffdddd;
     }
 
     .asiento.seleccionado .circle {
       background: #1976d2;
-      color: #fff;
     }
+
     .asiento.seleccionado .label {
       color: #bbdefb;
     }
+
+    .asiento .fa-chair { color: #6d451b; font-size: 28px; }
+    .asiento .fa-ban { color: #ffb4b4; font-size: 28px; }
+    .asiento .fa-user { color: #90c0e8; font-size: 28px; }
 
     #btnConfirmar {
       position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
@@ -112,13 +124,12 @@
     @media (max-width: 768px) {
       .wrap { padding: 10px; }
       .asientos { grid-template-columns: repeat(4, 1fr); }
-      .asiento .circle { width:70px; height:70px; font-size: 18px; }
       .asiento .label { font-size: 18px; max-width: 50px; }
       #btnConfirmar { width: 90%; max-width: none; }
     }
     @media (max-width: 480px) {
       .asientos { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .asiento .circle { width: 70px; height: 70px; font-size: 14px; }
+      .asiento .circle { width: 70px; height: 70px; font-size: 40px; }
       .asiento .label { font-size: 14px; max-width: 45px; }
       h1 { font-size: 32px; }
       .mesa h3 { font-size: 24px; }
@@ -127,7 +138,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Elegí tu mesa</h1>
+    <h1>Elegí tu lugar</h1>
     <div id="summary" class="summary">Cargando...</div>
     <div id="mesas"></div>
   </div>
@@ -186,24 +197,38 @@
 
           const btn = document.createElement("div");
           btn.className = "asiento";
+          // Determinar estado del asiento
+          const ocupadoPorOtro = ocupado && ocupado.invitado_id !== invitado.id;
+          const esSeleccionado = isSelected;
+
+          // Determinar ícono, texto, clase y acción
+          let icon = '<i class="fa-solid fa-chair"></i>'; // libre por defecto
+          let label = "";
+          let title = "";
+          let claseExtra = "";
+          let onClick = () => toggleSeleccion(mesa.id, i);
+
+          if (ocupadoPorOtro) {
+            icon = '<i class="fa-solid fa-ban"></i>'; // ocupado
+            label = ocupado?.invitados?.nombre || "Ocupado";
+            title = label;
+            claseExtra = "ocupado";
+            onClick = null; // desactiva clic
+          } else if (esSeleccionado) {
+            icon = '<i class="fa-solid fa-user"></i>'; // tu selección
+            label = "Vos";
+            claseExtra = "seleccionado";
+          }
+
+          // Render
+          btn.className = `asiento ${claseExtra}`.trim();
           btn.innerHTML = `
-            <div class="circle">#${i}</div>
-            <div class="label"></div>
+            <div class="circle">${icon}</div>
+            <div class="label">${label}</div>
           `;
 
-          if (ocupado && ocupado.invitado_id !== invitado.id) {
-            btn.classList.add("ocupado");
-            const nombre = (ocupado.invitados && ocupado.invitados.nombre) ? ocupado.invitados.nombre : "Ocupado";
-            btn.querySelector(".label").textContent = nombre;
-            btn.title = nombre;
-          } else if (isSelected) {
-            btn.classList.add("seleccionado");
-            btn.querySelector(".label").textContent = "Vos";
-            btn.onclick = () => toggleSeleccion(mesa.id, i);
-          } else {
-            btn.querySelector(".label").textContent = "";
-            btn.onclick = () => toggleSeleccion(mesa.id, i);
-          }
+          if (title) btn.title = title;
+          if (onClick) btn.onclick = onClick;
 
           grid.appendChild(btn);
         }
